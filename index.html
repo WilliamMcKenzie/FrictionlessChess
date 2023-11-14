@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess, Frictionless</title>
+    <script defer src="script.js"></script>
+    <link rel="stylesheet"
+      href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
+      integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU"
+      crossorigin="anonymous">
+</head>
+<body onload="battleBots()">
+    <div style="display: flex;">
+        <div id="board" style="width: 400px"></div>
+        <div style="display: flex;">
+            <img id="face" style="width: 50px; height: 50px;" src="./img/difficulties/easy.png">
+            <p id="face_speechbox">HAHAHA! lets play</p>
+            <button id="restart" onclick="reloadWindow()" style="margin: 10px; height: fit-content; visibility: hidden;">Restart</button>
+        </div>
+    </div>
+    
+    <input id="fen" onchange="onFenEdit()">
+    <p id="score"></p>
+    <div>
+        <button onclick="onEasySelected()" style="color: rgb(255, 255, 255); background-color: rgb(206, 247, 69); border: 2px solid white;">Easy Mode</button>
+        <button onclick="onMediumSelected()" style="color: rgb(255, 255, 255); background-color: rgb(69, 247, 167); border: 2px solid white;">Medium Mode</button>
+        <button onclick="onHardSelected()" style="color: rgb(255, 255, 255); background-color: rgb(69, 72, 247); border: 2px solid white;">Hard Mode</button>
+        <button onclick="onDemonSelected()" style="color: rgb(255, 255, 255); background-color: rgb(247, 158, 69); border: 2px solid white;">Demon Mode</button>
+        <button onclick="onSSSelected()" style="color: rgb(255, 255, 255); background-color: rgb(247, 69, 69); border: 2px solid white;">God</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"
+        crossorigin="anonymous"></script>
+
+    <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"
+        integrity="sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD"
+        crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.js" integrity="sha384-s3XgLpvmHyscVpijnseAmye819Ee3yaGa8NxstkJVyA6nuDFjt59u1QvuEl/mecz" crossorigin="anonymous"></script>
+</body>
+</html>
