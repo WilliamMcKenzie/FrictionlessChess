@@ -261,10 +261,10 @@ function moveAI () {
   }
 
   game.move(optimalMove)
+  saySomething()
   board.position(game.fen())
   fenEle.value = game.fen()
   onMove()
-  saySomething()
 
   // exit if the game is over
   if (game.game_over()){
