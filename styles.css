@@ -118,7 +118,11 @@ body {
     width: 0;
 }
 
-#codeInput {
+.custom_bot_code_container {
+    display: flex;
+    flex-direction: column;
+}
+.codeInputHeader {
     outline: none;
     border: 0;
     border-top-right-radius: 10px;
@@ -128,7 +132,21 @@ body {
     margin: 0;
     margin-top: 20px;
     padding: 10px;
-    color: #f0d9b5;
+    font-family: monospace;
+    color: var(--primary);
+    resize: none;
+
+
+    width: calc(70vh + 57.5vh - 20px);
+}
+#codeInput {
+    outline: none;
+    border: 0;
+    background-color: #242832;
+
+    margin: 0;
+    padding: 10px;
+    color: white;
     resize: none;
 
 
@@ -156,14 +174,14 @@ body {
     align-items: center;
     justify-content: center;
     font-size: 1.25rem;
-    background-color: var(--background);
-    color: #242832;
+    background-color: var(--backgroundLight);
+    color: #1d212b;
     margin: 5px;
 
     transition: 0.3s;
 }
 
 .code_options button:hover {
-    background-color: var(--backgroundLight);
+    filter: brightness(1.2);
     cursor: pointer;
 }

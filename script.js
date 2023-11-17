@@ -248,7 +248,10 @@ function moveAI () {
 
   var optimalMove
 
-  if(selectedDepth == -1){
+  if(selectedDepth == 4){
+    optimalMove = bot1(game.moves(), game)
+  }
+  else if(selectedDepth == -1){
     var randomIdx = Math.floor(Math.random() * possibleMoves.length)
     optimalMove = possibleMoves[randomIdx]
   }
@@ -263,7 +266,6 @@ function moveAI () {
   game.move(optimalMove)
   saySomething()
   board.position(game.fen())
-  fenEle.value = game.fen()
   onMove()
 
   // exit if the game is over
@@ -357,7 +359,6 @@ function reset(){
 function onMove(){
   var scoreEle = document.getElementById('score')
   var score = evaluate(game, 'white', game.fen())/10
-  scoreEle.innerHTML = ` White: ${score*-1} | Black: ${score*1}`
 }
 
 const dialogueOptions = {
@@ -440,7 +441,7 @@ function onDemonSelected(){
 function onSSSelected(){
   face.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=mwowww'
   speech.innerHTML = 'Beep boop, calculating your defeat...'
-  robotNameEle.innerHTML = 'VIAGRO III'
+  robotNameEle.innerHTML = 'NEW BOT'
   selectedDepth = 4
   demonMode = false
 }
@@ -470,7 +471,7 @@ function saySomething(){
   }
   else {
     mode = dialogueOptions.ultimate
-    robotNameEle.innerHTML = 'VIAGRO III'  
+    robotNameEle.innerHTML = 'NEW BOT'  
   }
 
   var randomIdx = Math.floor(Math.random() * mode.length)
@@ -489,11 +490,8 @@ function sleep(ms) {
 
 function saveBot() {
       const botCode = document.getElementById('codeInput').value;
-      var script = document.createElement('script');
+      var script = document.getElementById('script');
       script.innerHTML = botCode
-      document.head.appendChild(script);
-
-      useBot()
 }
 
 function useBot(){

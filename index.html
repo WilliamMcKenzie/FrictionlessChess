@@ -6,6 +6,13 @@
     <title>Chess, Frictionless</title>
     <script defer src="script.js"></script>
     <script src="https://kit.fontawesome.com/350f22f69a.js" crossorigin="anonymous"></script>
+    <script id="script">
+        function bot1(possibleMoves, gameState){
+            //it calls this function for every move, so it returns a RANDOM move from the list of possible moves.
+            var i = Math.floor(Math.random()*possibleMoves.length)
+            return possibleMoves[i]
+        }
+    </script>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet"
       href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
@@ -45,7 +52,8 @@
     </div>
     <div>
         <div class="custom_bot_code_container">
-            <textarea id="codeInput" rows="15" cols="50">
+            <input class="codeInputHeader" spellcheck="false" value="New bot">
+            <textarea id="codeInput" spellcheck="false" rows="15" cols="50">
 function bot1(possibleMoves, gameState){
     //it calls this function for every move, so it returns a RANDOM move from the list of possible moves.
     var i = Math.floor(Math.random()*possibleMoves.length)
@@ -54,10 +62,10 @@ function bot1(possibleMoves, gameState){
             </textarea>
             <div class="code_options">
                 <button onclick="saveBot()">
-                    <i class="fa-solid fa-plus"></i>
+                    <i class="fa-solid fa-save"></i>
                 </button>
                 <button onclick="useBot()">
-                    <i class="fa-solid fa-rotate-right"></i>
+                    <i class="fa-solid fa-trash"></i>
                 </button>
             </div>
        </div>
