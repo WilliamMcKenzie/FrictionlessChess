@@ -4,6 +4,8 @@ var fenEle = document.getElementById("fen")
 var moveHistory = []
 var currentMoveIndex = 0
 
+var customBots = ['New bot']
+
 const pieceVal = { 'p': 100, 'n': 280, 'b': 320, 'r': 479, 'q': 929, 'k': 60000, 'P' : -100, 'N' : -280, 'B' : -320, 'R' : -479, 'Q' : -929, 'K' : -60000}
 
 var positionMap = {
@@ -488,10 +490,17 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function saveBot() {
-      const botCode = document.getElementById('codeInput').value;
-      var script = document.getElementById('script');
-      script.innerHTML = botCode
+function createBot(){
+
+}
+
+function saveBot(scriptId) {
+    const botCode = document.getElementById('codeInput').value;
+    var script = document.createElement('script');
+    script.id = scriptId
+    script.innerHTML = botCode
+    document.head.removeChild(document.getElementById(scriptId))
+    document.head.appendChild(script)
 }
 
 function useBot(){
