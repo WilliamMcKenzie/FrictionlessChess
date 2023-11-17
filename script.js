@@ -492,6 +492,8 @@ function saveBot() {
       var script = document.createElement('script');
       script.innerHTML = botCode
       document.head.appendChild(script);
+
+      useBot()
 }
 
 function useBot(){
