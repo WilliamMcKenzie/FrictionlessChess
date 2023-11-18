@@ -3,16 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chess, Frictionless</title>
+    <title>Chess Colosseum</title>
+    <link rel="icon" type="image/x-icon" href="img/favicon/android-chrome-192x192.png">
     <script defer src="script.js"></script>
     <script src="https://kit.fontawesome.com/350f22f69a.js" crossorigin="anonymous"></script>
-    <script id="bot 1">
-        function bot1(possibleMoves, gameState){
-            //it calls this function for every move, so it returns a RANDOM move from the list of possible moves.
-            var i = Math.floor(Math.random()*possibleMoves.length)
-            return possibleMoves[i]
-        }
-    </script>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet"
       href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
@@ -21,36 +15,48 @@
 </head>
 <body>
     <div style="display: flex;">
-        <div id="board" style="width: 70vh"></div>
+        <div>
+            <div id="topBoard" class="board_addon" style="width: 70vh;">
+                <img id="topFace" src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat">
+                <p id="topName">POTLICK</p>
+            </div>
+            <div id="board" style="width: 70vh"></div>
+            <div id="bottomBoard" style="width: 70vh;" class="board_addon">
+                <img id="bottomFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow">
+                <p id="bottomName">YOU</p>
+                <button id="restart" onclick="restartGame()" disabled> <i class="fa-solid fa-rotate" style="margin-right: 5px;"></i>REMATCH</button>
+                <button class="start_button" id="startButton" disabled onclick="battleBots()"><i class="fa-solid fa-play"></i> RUN</button>
+                <button class="resign_button" onclick="resign()"><i class="fa-solid fa-flag"></i></button>
+            </div>
+        </div>
         <div class="main_container">
             <div style="display: flex;">
                 <img id="face" style="width: 80px; height: 80px;" src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat">
                 <div style="width: 250px; margin-top: 25px;">
                     <div id="face_speechbox_container"> <a id="robot_name">POTLICK</a> <p id="face_speechbox">HAHAHA! lets play</p></div>
                 </div>
-                <button id="restart" onclick="reloadWindow()" style="margin: 10px; height: fit-content; visibility: hidden;">Restart</button>
             </div>
-            <div class="bot_selection_container">
-                <a>ADDED BOTS</a>
-                <button class="icon_button" onclick="onBraindeadSelected()" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat);">
+            <div id="botContainer" class="bot_selection_container">
+                <a><p style="margin: 0;">ADDED BOTS</p> <p style="margin: 0; margin-left: auto; font-size: 0.8rem; font-weight: 500;">LOCK FIRST:<input id="lockFirst" checked type="checkbox" onchange="lockChange(1)"> LOCK SECOND:<input id="lockSecond" type="checkbox" onchange="lockChange(2)"></p></a>
+                <button class="icon_button selected_bot locked_bot" id='0' onclick="activateBot(0)" style="background-image: url(https://api.dicebear.com/7.x/personas/svg?seed=Shadow);">
                 </button>
-                <button class="icon_button" onclick="onEasySelected()" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=meditti);">
+                <button class="icon_button selected_bot" id='1' onclick="activateBot(1)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat);">
                 </button>
-                <button class="icon_button" onclick="onMediumSelected()" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=hamza);">
+                <button class="icon_button" id='2'onclick="activateBot(2)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=meditti);">
                 </button>
-                <button class="icon_button" onclick="onHardSelected()" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=pooper);">
+                <button class="icon_button" id='3' onclick="activateBot(3)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=hamza);">
                 </button>
-                <button class="icon_button" onclick="onDemonSelected()" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=earss);">
+                <button class="icon_button" id='4' onclick="activateBot(4)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=pooper);">
                 </button>
-                <button class="icon_button" onclick="onSSSelected()" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=mwowww);">
+                <button class="icon_button" id='5' onclick="activateBot(5)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=earss);">
                 </button>
-                <button class="create_bot_button" onclick="goToCreateBot()" style="background-image: url(https://cdn.pixabay.com/photo/2017/03/19/03/51/material-icon-2155448_1280.png);">
+                <button id="createBotButton" class="create_bot_button" onclick="createBot()" style="background-image: url(https://cdn.pixabay.com/photo/2017/03/19/03/51/material-icon-2155448_1280.png);">
                     <i class="fa-solid fa-plus"></i>
                 </button>
             </div>
         </div>
     </div>
-    <div>
+    <div style="visibility: hidden;">
         <div class="custom_bot_code_container">
             <input class="codeInputHeader" spellcheck="false" value="New bot">
             <textarea id="codeInput" spellcheck="false" rows="15" cols="50">
@@ -61,7 +67,7 @@ function bot1(possibleMoves, gameState){
 }
             </textarea>
             <div class="code_options">
-                <button onclick="saveBot('bot 1')">
+                <button onclick="saveBot('script1', 1)">
                     <i class="fa-solid fa-save"></i>
                 </button>
                 <button onclick="useBot()">

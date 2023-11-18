@@ -4,7 +4,60 @@ var fenEle = document.getElementById("fen")
 var moveHistory = []
 var currentMoveIndex = 0
 
-var customBots = ['New bot']
+var lockFirst = true
+var lockSecond = false
+
+var stopGame = false
+
+const dialogueOptions = {
+  dummy: [
+    "I'm just learning the ropes here.",
+    "Chess? What's that?",
+    "Is this thing on?",
+    "I hope I don't embarrass myself."
+  ],
+  easy: [
+    "I'm still warming up.",
+    "Chess is fun! Right?",
+    "Let's keep it casual, shall we?",
+    "I might surprise you, or not."
+  ],
+  medium: [
+    "I've got a few tricks up my sleeve.",
+    "This game is getting interesting.",
+    "I've been practicing a bit.",
+    "Let's see who makes the first blunder."
+  ],
+  hard: [
+    "I play to win, fair warning.",
+    "This won't be a walk in the park.",
+    "I've studied a bit of strategy.",
+    "Prepare for a challenge!"
+  ],
+  elite: [
+    "I've mastered the art of chess.",
+    "You're in for a serious game.",
+    "Do you even stand a chance?",
+    "I see your every move in advance.",
+    "I cant let you get close!",
+    "Fucking amateur."
+  ],
+  ultimate: [
+    "I am the chess grandmaster.",
+    "Your fate is sealed from the start.",
+    "This is more of a lesson than a game.",
+    "I play on a level beyond imagination.",
+    "I cant let you get close!",
+    "Fucking amateur."
+  ]
+};
+
+var addedBots = [{name: 'You', faceCode: 'Shadow', id: 0},{name: 'Potlick', faceCode: 'skinnyfat', id: 1, function: makeRandomMove, lines: dialogueOptions.dummy}, {name: 'Chester', faceCode: 'meditti', id: 2, function: chesterFunction, lines: dialogueOptions.easy}, {name: 'Barley', faceCode: 'hamza', id: 3, function: barleyFunction, lines: dialogueOptions.medium}, {name: 'Sander', faceCode: 'pooper', id: 4, function: sanderFunction, lines: dialogueOptions.hard}, {name: 'Master Homo-Yo', faceCode: 'earss', id: 5, function: homoFunction, lines: dialogueOptions.ultimate}]
+var customBots = []
+
+var selectedBots = [addedBots[0],addedBots[1]]
+//bot whos turn it is
+var selectedBot = 0
 
 const pieceVal = { 'p': 100, 'n': 280, 'b': 320, 'r': 479, 'q': 929, 'k': 60000, 'P' : -100, 'N' : -280, 'B' : -320, 'R' : -479, 'Q' : -929, 'K' : -60000}
 
@@ -80,6 +133,7 @@ positionMap['k'] = positionMap['K'].slice().reverse()
 var balance = 0
 var selectedDepth = -1
 var demonMode = false
+var side = 'b'
 
 function evaluate(gameToEval, side, fen){
   var total = 0
@@ -105,9 +159,7 @@ function evaluate(gameToEval, side, fen){
   }
   return total+positionValue
 }
-var moveCount = 0
 
-var side = 'b'
 //demo call: depthSearch2(3, 3, game, -Infinity, Infinity)
 //a = maximum of the minimum children
 //b = minimum of the maximum children
@@ -119,7 +171,6 @@ function depthSearchMed(depth, originalDepth, algo, a, b){
 
   for(var i = 0; i < moves.length; i++){
     algo.move(moves[i])
-    moveCount++
 
     if(depth > 0){
       var min = yourTurn ? -Infinity : a
@@ -166,7 +217,7 @@ function getBestMove(){
   for(var i = 0; i < moves.length; i++){
     algo.move(moves[i])
 
-    var search = depthSearchMed(selectedDepth-1, selectedDepth-1, algo, -Infinity, Infinity)
+    var search = depthSearchMed(1, 1, algo, -Infinity, Infinity)
     if(search > safestMove[1]) safestMove = [moves[i], search]
 
     algo = new Chess(game.fen())
@@ -186,7 +237,6 @@ function depthSearch(depth, originalDepth, algo, totalEval, side, rootMove, curr
 
   //loop through all possible moves from current game position, and make them on dummy board
   for(var i = 0; i < moves.length; i++){
-    moveCount++
 
     algo.move(moves[i])
     var fen = algo.fen()
@@ -244,42 +294,68 @@ function depthSearch(depth, originalDepth, algo, totalEval, side, rootMove, curr
   return originalDepth == 2 && depth == 0 ? min : originalDepth == 1 ? max : depth+1 == originalDepth ? safestMove : depth > 0 ? min : max
 }
 
-function moveAI () {
-  var possibleMoves = game.moves()
+function makeRandomMove(){
+  var i = Math.round(Math.random()*game.moves().length)
+  console.log(game.moves())
+  return game.moves()[i]
+}
+
+function chesterFunction(){
   var algo = new Chess(game.fen())
 
-  var optimalMove
+  var depth = depthSearch(1, 1, algo, evaluate(algo, game.turn(), game.fen()), game.turn(), '', 1000, -1000)
+  return depth[1]
+}
 
-  if(selectedDepth == 4){
-    optimalMove = bot1(game.moves(), game)
-  }
-  else if(selectedDepth == -1){
-    var randomIdx = Math.floor(Math.random() * possibleMoves.length)
-    optimalMove = possibleMoves[randomIdx]
-  }
-  else if(selectedDepth != 2 & selectedDepth != 4){
-    var depth = depthSearch(selectedDepth, selectedDepth, algo, evaluate(algo, game.turn(), game.fen()), game.turn(), '', 1000, -1000)
-    optimalMove = depth[1]
-  }
-  else{
-    optimalMove = getBestMove()[0]
+function barleyFunction(){
+  return getBestMove()[0]
+}
+
+function sanderFunction(){
+  var algo = new Chess(game.fen())
+
+  var depth = depthSearch(3, 3, algo, evaluate(algo, game.turn(), game.fen()), game.turn(), '', 1000, -1000)
+  return depth[1]
+}
+
+function homoFunction(){
+  var algo = new Chess(game.fen())
+  demonMode = true
+
+  var depth = depthSearch(3, 3, algo, evaluate(algo, game.turn(), game.fen()), game.turn(), '', 1000, -1000)
+
+  demonMode = false
+  return depth[1]
+}
+
+function moveAI () {
+  var optimalMove
+  var bot = selectedBots[selectedBot]
+
+  if(bot.uniqueFunctionParams){
+    optimalMove = bot.function(game.moves(), game)
+  } else {
+    optimalMove = bot.function()
   }
 
   game.move(optimalMove)
   saySomething()
   board.position(game.fen())
-  onMove()
 
   // exit if the game is over
-  if (game.game_over()){
+  if (game.game_over() && !document.getElementById('botContainer').classList.contains("no_access")){
     document.getElementById('face_speechbox').innerHTML = 'Good game!'
-    document.getElementById('restart').style.visibility = 'visible'
+    document.getElementById('restart').disabled = false
     return
-  } 
+  } else if(game.game_over()){
+    resign()
+  }
+
+  selectedBot == 0 ? selectedBot = 1 : selectedBot = 0
 }
 
 
-var isBotLoading = false
+//board logic
 function onDragStart (source, piece, position, orientation) {
   // do not pick up pieces if the game is over
   if (game.game_over()) return false
@@ -302,16 +378,16 @@ async function onDrop (source, target) {
   // illegal move
   if (move === null) return 'snapback'
   moveHistory.push(game.fen())
+  selectedBot == 0 ? selectedBot = 1 : selectedBot = 0
 
   await sleep(500)
   moveAI()
   board.position(game.fen())
 }
 
-// update the board position after the piece snap
-// for castling, en passant, pawn promotion
 async function onSnapEnd () {
   board.position(game.fen())
+  document.getElementById('restart').disabled = true
 }
 
 var config = {
@@ -323,7 +399,8 @@ var config = {
 }
 board = Chessboard('board', config)
 
-//for shuffling the possible moves, to get variation
+
+//utilities
 function shuffle(array) {
   let currentIndex = array.length,  randomIndex;
 
@@ -358,149 +435,195 @@ function reset(){
   game = new Chess()
   board.position(game.fen())
 }
-function onMove(){
-  var scoreEle = document.getElementById('score')
-  var score = evaluate(game, 'white', game.fen())/10
-}
 
-const dialogueOptions = {
-  dummy: [
-    "I'm just learning the ropes here.",
-    "Chess? What's that?",
-    "Is this thing on?",
-    "I hope I don't embarrass myself."
-  ],
-  easy: [
-    "I'm still warming up.",
-    "Chess is fun! Right?",
-    "Let's keep it casual, shall we?",
-    "I might surprise you, or not."
-  ],
-  medium: [
-    "I've got a few tricks up my sleeve.",
-    "This game is getting interesting.",
-    "I've been practicing a bit.",
-    "Let's see who makes the first blunder."
-  ],
-  hard: [
-    "I play to win, fair warning.",
-    "This won't be a walk in the park.",
-    "I've studied a bit of strategy.",
-    "Prepare for a challenge!"
-  ],
-  elite: [
-    "I've mastered the art of chess.",
-    "You're in for a serious game.",
-    "Do you even stand a chance?",
-    "I see your every move in advance.",
-    "I cant let you get close!",
-    "Fucking amateur."
-  ],
-  ultimate: [
-    "I am the chess grandmaster.",
-    "Your fate is sealed from the start.",
-    "This is more of a lesson than a game.",
-    "I play on a level beyond imagination.",
-    "I cant let you get close!",
-    "Fucking amateur."
-  ]
-};
 
 var face = document.getElementById('face')
 var speech = document.getElementById('face_speechbox')
 var robotNameEle = document.getElementById('robot_name')
-function onBraindeadSelected(){
-  face.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat'
-  speech.innerHTML = 'How does the knight move again?'
-  robotNameEle.innerHTML = 'POTLICK'
-  selectedDepth = -1
-}
-function onEasySelected(){
-  face.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=meditti'
-  speech.innerHTML = 'Lets have a good match!'
-  robotNameEle.innerHTML = 'CHESTER'
-  selectedDepth = 1
-}
-function onMediumSelected(){
-  face.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=hamza'
-  speech.innerHTML = 'Challenging me? How foolish.'
-  robotNameEle.innerHTML = 'BARLEY'
-  selectedDepth = 2
-}
-function onHardSelected(){
-  face.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=pooper'
-  speech.innerHTML = 'You cannot win!'
-  robotNameEle.innerHTML = 'SANDER'
-  selectedDepth = 3
-}
-function onDemonSelected(){
-  face.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=earss'
-  speech.innerHTML = 'It is time to taste my glory.'
-  robotNameEle.innerHTML = 'MASTER HOMO-YO'
-  selectedDepth = 3
-  demonMode = true
-}
-function onSSSelected(){
-  face.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=mwowww'
-  speech.innerHTML = 'Beep boop, calculating your defeat...'
-  robotNameEle.innerHTML = 'NEW BOT'
-  selectedDepth = 4
-  demonMode = false
-}
 
 function saySomething(){
-  var mode 
+  var bot = selectedBots[selectedBot]
+  var randomIdx = Math.floor(Math.random() * bot.lines.length)
+  speech.innerHTML = bot.lines[randomIdx]
 
-  if(selectedDepth == -1){
-     mode = dialogueOptions.dummy
-     robotNameEle.innerHTML = 'POTLICK'
-  }
-  else if(selectedDepth == 1){
-     mode = dialogueOptions.easy
-     robotNameEle.innerHTML = 'CHESTER'
-  }
-  else if(selectedDepth == 2){ 
-    mode = dialogueOptions.medium
-    robotNameEle.innerHTML = 'BARLEY'
-  }
-  else if(selectedDepth == 3 && demonMode != true){ 
-    mode = dialogueOptions.hard
-    robotNameEle.innerHTML = 'SANDER'
-  }
-  else if(selectedDepth == 3){
-     mode = dialogueOptions.elite
-     robotNameEle.innerHTML = 'MASTER HOMO-YO'  
-  }
-  else {
-    mode = dialogueOptions.ultimate
-    robotNameEle.innerHTML = 'NEW BOT'  
-  }
+  if(bot.faceCode) face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.faceCode}`
+  else face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
 
-  var randomIdx = Math.floor(Math.random() * mode.length)
-
-  speech.innerHTML = mode[randomIdx]
+  robotNameEle.innerHTML = bot.name.toUpperCase()
 }
 
-function reloadWindow(){
-  window.location.reload() 
-  document.getElementById('restart').style.visibility = 'hidden'
+function restartGame(){
+  board = Chessboard('board', config)
+  game = new Chess()
+  document.getElementById('restart').disabled = true
 }
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function createBot(){
 
+
+
+function lockChange(which){
+  if(which == 1) {
+    lockFirst == true ? lockFirst = false : lockFirst = true
+
+    if(lockFirst){
+      document.getElementById(selectedBots[0].id.toString()).classList.add('locked_bot')
+    } else {
+      document.getElementById(selectedBots[0].id.toString()).classList.remove('locked_bot')
+    }
+  } else {
+    lockSecond == true ? lockSecond = false : lockSecond = true
+
+    if(lockSecond){
+      document.getElementById(selectedBots[1].id.toString()).classList.add('locked_bot')
+    } else {
+      document.getElementById(selectedBots[1].id.toString()).classList.remove('locked_bot')
+    }
+  }
 }
 
-function saveBot(scriptId) {
-    const botCode = document.getElementById('codeInput').value;
+function alterSelectedBots(newBot){
+  var oldClassList = document.getElementById(selectedBots[0].id).classList
+  var newClassList = document.getElementById(newBot.id.toString()).classList
+
+  if(lockFirst && lockSecond){
+    return
+  }
+  if(lockFirst){
+    document.getElementById(selectedBots[1].id).classList.remove('selected_bot')
+    newClassList.add('selected_bot')
+    selectedBots.pop()
+    selectedBots.push(newBot)
+
+    return
+  }
+  if(lockSecond){
+    oldClassList.remove('selected_bot')
+    newClassList.add('selected_bot')
+    selectedBots.shift()
+    selectedBots.unshift(newBot)
+
+    return
+  }
+  if(!lockFirst && !lockSecond){
+    oldClassList.remove('selected_bot')
+    newClassList.add('selected_bot')
+    selectedBots.shift()
+    selectedBots.push(newBot)
+  }
+}
+
+function addPlayersToBoardAddon(){
+  var topFace = document.getElementById("topFace")
+  var topName = document.getElementById("topName")
+  var bottomFace = document.getElementById("bottomFace")
+  var bottomName = document.getElementById("bottomName")
+
+  if(selectedBots[1].faceCode){
+    if(selectedBots[1].name == "You") topFace.src = `https://api.dicebear.com/7.x/personas/svg?seed=Shadow`
+    else topFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[1].faceCode}`
+  }else{
+    topFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[1].name}`
+  }
+
+  if(selectedBots[0].faceCode){
+    if(selectedBots[0].name == "You") bottomFace.src = `https://api.dicebear.com/7.x/personas/svg?seed=Shadow`
+    else bottomFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[0].faceCode}`
+  }else{
+    bottomFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[0].name}`
+  }
+
+  topName.innerHTML = selectedBots[1].name.toUpperCase()
+  bottomName.innerHTML = selectedBots[0].name.toUpperCase()
+}
+
+function disableStart(){
+  if(selectedBots[0].name !== "You" && selectedBots[1].name !== "You") startButtonEle.disabled = false
+  else startButtonEle.disabled = true
+}
+
+var startButtonEle = document.getElementById("startButton")
+function activateBot(botID){
+  if(addedBots[botID].name == "You"){
+    face.src = `https://api.dicebear.com/7.x/personas/svg?seed=Shadow`
+
+    robotNameEle.innerHTML = addedBots[botID].name.toUpperCase()
+    speech.innerHTML = "Let's do this!"
+
+    alterSelectedBots(addedBots[botID])
+    addPlayersToBoardAddon()
+    disableStart()
+    return
+  }
+
+  face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${addedBots[botID].faceCode}`
+  speech.innerHTML = addedBots[botID].lines[0]
+  robotNameEle.innerHTML = addedBots[botID].name.toUpperCase()
+
+  alterSelectedBots(addedBots[botID])
+  addPlayersToBoardAddon()
+
+  disableStart()
+}
+function activateCustomBot(bot){
+  face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
+  speech.innerHTML = bot.lines[0]
+  robotNameEle.innerHTML = bot.name.toUpperCase()
+  
+  alterSelectedBots(bot)
+  addPlayersToBoardAddon()
+
+  disableStart()
+}
+
+function saveBot(scriptId, botNUM) {
+    var botCode = document.getElementById('codeInput').value;
     var script = document.createElement('script');
     script.id = scriptId
     script.innerHTML = botCode
+    
     document.head.removeChild(document.getElementById(scriptId))
     document.head.appendChild(script)
+    
+    var functionReference = window[`bot${botNUM}`]
+    customBots[botNUM-1].function = functionReference
+
+    console.log(customBots[botNUM-1].function)
+}
+
+function createBot(){
+  var botNUM = customBots.length+1
+  var botContainer = document.getElementById('botContainer')
+  var createBotButton = document.getElementById('createBotButton')
+
+  var script = document.createElement('script');
+  script.id = `script${botNUM}`
+  script.innerHTML = `
+  function bot${botNUM}(possibleMoves, gameState){
+    //it calls this function for every move, so it returns a RANDOM move from the list of possible moves.
+    var i = Math.floor(Math.random()*possibleMoves.length)
+    return possibleMoves[i]
+  }`
+  document.head.appendChild(script)
+
+  var botID = Math.round(Math.random()*10000)
+  var functionReference = eval(`bot${botNUM}`)
+  var bot = {name: `new bot ${botNUM}`, id: botID, num: botNUM, function: window[`bot${botNUM}`], uniqueFunctionParams: true, lines: ['Beep boop, calculating your defeat...', 'System overload!', 'How does the pawn move again?']}
+
+  var botHTML = document.createElement('button')
+  botHTML.classList.add('icon_button')
+  botHTML.style.backgroundImage = `url("https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}")`
+  botHTML.onclick = function() {activateCustomBot(bot)}
+  botHTML.id = botID
+  
+  botContainer.removeChild(document.getElementById('createBotButton'))
+  botContainer.appendChild(botHTML)
+  botContainer.appendChild(createBotButton)
+
+  customBots.push(bot)
 }
 
 function useBot(){
@@ -508,10 +631,39 @@ function useBot(){
 }
 
 function moveCustomBot(){
-  game.move(bot1(game.moves(), game))
-  board.position(game.fen())
-  window.setTimeout(moveCustomBot, 500)
+  side == "w" ? side = "b" : side = "w"
+
+  moveAI()
+
+  if(!stopGame){
+    window.setTimeout(moveCustomBot, 1000)
+  } else {
+    document.getElementById('botContainer').classList.remove("no_access")
+    startButtonEle.disabled = false
+    stopGame = false 
+    return
+  }
 }
 
+function battleBots(){
+  resign()
+  startButtonEle.disabled = true
+  document.getElementById('botContainer').classList.add("no_access")
+  side = "w"
+  moveAI()
+  window.setTimeout(moveCustomBot, 1000)
+}
+
+function resign(){
+  if(document.getElementById('botContainer').classList.contains("no_access")){
+    stopGame = true
+    startButtonEle.disabled = false
+    document.getElementById('face_speechbox').innerHTML = 'Good game!'
+    document.getElementById('restart').disabled = false
+  } else {
+    board = Chessboard('board', config)
+    game = new Chess()
+  }
+}
 // moveAI()
 // board.position(game.fen())
