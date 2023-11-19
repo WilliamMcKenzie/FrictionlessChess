@@ -165,6 +165,7 @@ function evaluate(gameToEval, side, fen){
 //b = minimum of the maximum children
 function depthSearchMed(depth, originalDepth, algo, a, b){
   depth--
+
   var moves = shuffle(algo.moves())
   var yourTurn = depth % 2 == 0 ? true : false
   var savedGame = algo.fen()
@@ -203,7 +204,7 @@ function depthSearchMed(depth, originalDepth, algo, a, b){
       }
     }
 
-    algo = new Chess(savedGame)
+    algo.undo()
   }
 
   return yourTurn ? b : a
@@ -580,7 +581,8 @@ function activateCustomBot(bot){
 }
 
 function saveBot(scriptId, botNUM) {
-    var botCode = document.getElementById('codeInput').value;
+   document.getElementById(`saveButton${botNUM}`).disabled = true
+    var botCode = document.getElementById(`codeInput${botNUM}`).value;
     var script = document.createElement('script');
     script.id = scriptId
     script.innerHTML = botCode
@@ -601,12 +603,12 @@ function createBot(){
 
   var script = document.createElement('script');
   script.id = `script${botNUM}`
-  script.innerHTML = `
-  function bot${botNUM}(possibleMoves, gameState){
-    //it calls this function for every move, so it returns a RANDOM move from the list of possible moves.
-    var i = Math.floor(Math.random()*possibleMoves.length)
-    return possibleMoves[i]
-  }`
+  script.innerHTML = 
+`function bot${botNUM}(possibleMoves, gameState){
+  //it calls this function for every move, so it returns a RANDOM move from the list of possible moves.
+  var i = Math.floor(Math.random()*possibleMoves.length)
+  return possibleMoves[i]
+}`
   document.head.appendChild(script)
 
   var botID = Math.round(Math.random()*10000)
@@ -624,10 +626,40 @@ function createBot(){
   botContainer.appendChild(createBotButton)
 
   customBots.push(bot)
+  addNewCodeSection(bot)
 }
 
 function useBot(){
   window.setTimeout(moveCustomBot(), 500)
+}
+
+function addNewCodeSection(bot){
+  var HTMLToAdd = document.createElement('div')
+  HTMLToAdd.innerHTML = `<div class="custom_bot_code_container">
+  <input id='botNameElement${bot.num}' class="codeInputHeader" spellcheck="false" value="${bot.name}" onchange="updateBotName(${bot.num})">
+  <textarea onchange="document.getElementById('saveButton${bot.num}').disabled = false" id="codeInput${bot.num}" class="code_input" spellcheck="false" rows="15" cols="50" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">
+${bot.function}
+  </textarea>
+  <div class="code_options">
+      <button class="save_button" id="saveButton${bot.num}" disabled onclick="saveBot('script${bot.num}', ${bot.num})">
+          <i style="margin-right: 5px;" class="fa-solid fa-save"></i> SAVE
+      </button>
+      <button class="template_button" onclick="useBot()">
+          <i style="margin-right: 5px;" class="fa-solid fa-file"></i> TEMPLATE
+      </button>
+      <button class="trash_button" onclick="deleteBot()">
+          <i style="margin-right: 5px;" class="fa-solid fa-trash"></i> TRASH
+      </button>
+  </div>
+  </div>`
+document.getElementById('codeContainer').appendChild(HTMLToAdd)
+}
+
+function updateBotName(botNUM){
+  customBots[botNUM-1].name = document.getElementById(`botNameElement${botNUM}`).value
+  var bot = customBots[botNUM-1]
+
+  document.getElementById(bot.id).style.backgroundImage = `url("https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}")`
 }
 
 function moveCustomBot(){
