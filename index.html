@@ -58,7 +58,37 @@
         </div>
     </div>
     <div id="codeContainer" class="code_container">
-        <h1>CODE</h1>
+        <h1><i class="fa-solid fa-screwdriver-wrench" style="margin-right: 20px;"></i>WORKSHOP</h1>
+        <div class="sticky_header">
+            <button class="code_button" id="createBotButtonAlt" onclick="createBot()"><i class="fa-solid fa-chess-rook" style="margin-right: 5px;"></i> CREATE BOT</button>
+            <button class="code_button" id="createEvalButton" onclick="createEval()"><i class="fa-solid fa-chess-board" style="margin-right: 5px;"></i> CREATE EVALUATION FUNCTION</button>
+            <button class="code_button" id="createEvalButton" onclick="createMisc()"><i class="fa-solid fa-wrench" style="margin-right: 5px;"></i> CREATE MISC FUNCTION</button>
+        </div>
+    </div>
+    <div id="templatesPopupContainer" class="templates_popup_container hidden">
+        <div class="templates_popup">
+            <div class="templates_popup_header"><i class="fa-solid fa-code" style="margin-right: 5px;"></i></div>
+            <div id="popupBody" class="templates_popup_body">
+                <button class="template_button">
+                    <i class="fa-solid fa-chess-pawn" style="margin-right: 5px;"></i> RANDOM
+                </button>
+                <button class="template_button">
+                    <i class="fa-solid fa-chess-knight" style="margin-right: 5px;"></i> DEPTH 1
+                </button>
+                <button class="template_button">
+                    <i class="fa-solid fa-chess-rook" style="margin-right: 5px;"></i> DEPTH 2
+                </button>
+                <button class="template_button">
+                    <i class="fa-solid fa-chess-queen" style="margin-right: 5px;"></i> DEPTH 3
+                </button>
+            </div>
+            <div class="templates_popup_footer">
+                <button class="cancel_button" onclick="closePopup()">CANCEL</button>
+            </div>  
+        </div>
+    </div>
+    <div id="mask" class="mask hidden">
+
     </div>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"
         integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2"

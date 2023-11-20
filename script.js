@@ -135,7 +135,7 @@ var selectedDepth = -1
 var demonMode = false
 var side = 'b'
 
-function evaluate(gameToEval, side, fen){
+function evaluateLocal(gameToEval, side, fen){
   var total = 0
   var layout = fen.split(" ")[0]
 
@@ -195,7 +195,7 @@ function depthSearchMed(depth, originalDepth, algo, a, b){
     
     else {
       var currentGame = algo.fen()
-      var rating = evaluate(algo, side, currentGame)
+      var rating = evaluateLocal(algo, side, currentGame)
       if(yourTurn && rating < b){
         b = rating
       }
@@ -246,7 +246,7 @@ function depthSearch(depth, originalDepth, algo, totalEval, side, rootMove, curr
     if(depth+1 == originalDepth){
       //for if depth is only 1, just attack whenever possible
       if(originalDepth == 1){
-        var curEval = evaluate(algo, side, fen)
+        var curEval = evaluateLocal(algo, side, fen)
         if(curEval > max[0]){
           max = [curEval, moves[i]]
         }
@@ -277,7 +277,7 @@ function depthSearch(depth, originalDepth, algo, totalEval, side, rootMove, curr
     }
     //at last iteration, evaluate min
     else {
-      var curEval = evaluate(algo, side, fen)
+      var curEval = evaluateLocal(algo, side, fen)
       
       if(curEval < currentSafest && originalDepth % 2 == 0){
         return min
@@ -304,7 +304,7 @@ function makeRandomMove(){
 function chesterFunction(){
   var algo = new Chess(game.fen())
 
-  var depth = depthSearch(1, 1, algo, evaluate(algo, game.turn(), game.fen()), game.turn(), '', 1000, -1000)
+  var depth = depthSearch(1, 1, algo, evaluateLocal(algo, game.turn(), game.fen()), game.turn(), '', 1000, -1000)
   return depth[1]
 }
 
@@ -315,7 +315,7 @@ function barleyFunction(){
 function sanderFunction(){
   var algo = new Chess(game.fen())
 
-  var depth = depthSearch(3, 3, algo, evaluate(algo, game.turn(), game.fen()), game.turn(), '', 1000, -1000)
+  var depth = depthSearch(3, 3, algo, evaluateLocal(algo, game.turn(), game.fen()), game.turn(), '', 1000, -1000)
   return depth[1]
 }
 
@@ -323,7 +323,7 @@ function homoFunction(){
   var algo = new Chess(game.fen())
   demonMode = true
 
-  var depth = depthSearch(3, 3, algo, evaluate(algo, game.turn(), game.fen()), game.turn(), '', 1000, -1000)
+  var depth = depthSearch(3, 3, algo, evaluateLocal(algo, game.turn(), game.fen()), game.turn(), '', 1000, -1000)
 
   demonMode = false
   return depth[1]
@@ -333,6 +333,7 @@ function moveAI () {
   var optimalMove
   var bot = selectedBots[selectedBot]
 
+  console.log(bot)
   if(bot.uniqueFunctionParams){
     optimalMove = bot.function(game.moves(), game)
   } else {
@@ -382,7 +383,7 @@ async function onDrop (source, target) {
   selectedBot == 0 ? selectedBot = 1 : selectedBot = 0
 
   await sleep(500)
-  moveAI()
+  window.setTimeout(moveAI(), 0);
   board.position(game.fen())
 }
 
@@ -457,6 +458,7 @@ function restartGame(){
   board = Chessboard('board', config)
   game = new Chess()
   document.getElementById('restart').disabled = true
+  battleBots()
 }
 
 function sleep(ms) {
@@ -581,20 +583,24 @@ function activateCustomBot(bot){
 }
 
 function saveBot(scriptId, botNUM) {
-   document.getElementById(`saveButton${botNUM}`).disabled = true
-    var botCode = document.getElementById(`codeInput${botNUM}`).value;
-    var script = document.createElement('script');
-    script.id = scriptId
-    script.innerHTML = botCode
+  document.getElementById(`saveButton${botNUM}`).disabled = true
+  var botCode = document.getElementById(`codeInput${botNUM}`).value;
+  var script = document.createElement('script');
+  script.id = scriptId
+  script.innerHTML = botCode
     
-    document.head.removeChild(document.getElementById(scriptId))
-    document.head.appendChild(script)
+  document.head.removeChild(document.getElementById(scriptId))
+  document.head.appendChild(script)
     
+  if(botNUM < 100){
     var functionReference = window[`bot${botNUM}`]
     customBots[botNUM-1].function = functionReference
-
-    console.log(customBots[botNUM-1].function)
+  }
 }
+
+var botScriptCount = 0
+var evalScriptCount = 0
+var shuffleScriptCount = 0
 
 function createBot(){
   var botNUM = customBots.length+1
@@ -627,6 +633,47 @@ function createBot(){
 
   customBots.push(bot)
   addNewCodeSection(bot)
+  botScriptCount++
+}
+function createEval(){
+  var evalNUM = Math.round((Math.random()+1)*1000)
+
+  var script = document.createElement('script');
+  script.id = `script${evalNUM}`
+  script.innerHTML = 
+`function evaluate (gameState){
+  var totalScore = 0
+  var layout = gameState.fen().split(" ")[0]
+  
+  const pieceVal = { 'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9, 'k': 100, 'P' : -1, 'N' : -3, 'B' : -3, 'R' : -5, 'Q' : -9, 'K' : -100}
+
+  for(var piece of layout){
+    if(pieceVal[piece]){
+      totalScore += (pieceVal[piece]*(side == 'w' ? -1 : 1))
+    }
+  }
+  return totalScore
+}`
+  document.head.appendChild(script)
+
+  addNewEvalSection(evalNUM)
+  evalScriptCount++
+}
+function createMisc(){
+  var evalNUM = Math.round((Math.random()+1)*100000)
+
+  var script = document.createElement('script');
+  script.id = `script${evalNUM}`
+  script.innerHTML = 
+`function doSomething (gameState){
+  var something = "Hello World!"
+  return something
+}`
+  document.head.appendChild(script)
+
+  addNewMiscSection(evalNUM)
+
+  return evalNUM
 }
 
 function useBot(){
@@ -635,24 +682,136 @@ function useBot(){
 
 function addNewCodeSection(bot){
   var HTMLToAdd = document.createElement('div')
-  HTMLToAdd.innerHTML = `<div class="custom_bot_code_container">
+  HTMLToAdd.id = `codeSection${bot.id}`
+  HTMLToAdd.innerHTML = `<div class="custom_bot_code_container" id="container${bot.num}">
   <input id='botNameElement${bot.num}' class="codeInputHeader" spellcheck="false" value="${bot.name}" onchange="updateBotName(${bot.num})">
-  <textarea onchange="document.getElementById('saveButton${bot.num}').disabled = false" id="codeInput${bot.num}" class="code_input" spellcheck="false" rows="15" cols="50" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}">
+  <button class="collapse_button" onclick="collapseCode(${bot.num})">
+          <i class="fa-solid fa-chevron-down"></i>
+  </button>
+  <textarea onchange="document.getElementById('saveButton${bot.num}').disabled = false" id="codeInput${bot.num}" class="code_input" spellcheck="false" cols="50" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}" oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'>
 ${bot.function}
   </textarea>
   <div class="code_options">
       <button class="save_button" id="saveButton${bot.num}" disabled onclick="saveBot('script${bot.num}', ${bot.num})">
           <i style="margin-right: 5px;" class="fa-solid fa-save"></i> SAVE
       </button>
-      <button class="template_button" onclick="useBot()">
+      <button class="template_button" onclick="openPopup(${bot.num})">
           <i style="margin-right: 5px;" class="fa-solid fa-file"></i> TEMPLATE
       </button>
-      <button class="trash_button" onclick="deleteBot()">
+      <button class="trash_button" onclick="trashBot(${bot.id}, ${bot.num})">
           <i style="margin-right: 5px;" class="fa-solid fa-trash"></i> TRASH
       </button>
   </div>
   </div>`
-document.getElementById('codeContainer').appendChild(HTMLToAdd)
+  document.getElementById('codeContainer').appendChild(HTMLToAdd)
+
+  document.getElementById(`codeInput${bot.num}`).style.height = ""
+  document.getElementById(`codeInput${bot.num}`).style.height = document.getElementById(`codeInput${bot.num}`).scrollHeight + "px"
+}
+function addNewEvalSection(id){
+  var HTMLToAdd = document.createElement('div')
+  HTMLToAdd.id = `codeSection${id}`
+  HTMLToAdd.innerHTML = `<div class="custom_bot_code_container" id="container${id}">
+  <input class="codeInputHeader" spellcheck="false" value="evaluation function">
+  <button class="collapse_button" onclick="collapseCode(${id})">
+          <i class="fa-solid fa-chevron-down"></i>
+  </button>
+  <textarea onchange="document.getElementById('saveButton${id}').disabled = false" id="codeInput${id}" class="code_input" spellcheck="false" cols="50" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}" oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'>
+function evaluate (gameState){
+  var totalScore = 0
+  var layout = gameState.fen().split(" ")[0]
+  const pieceVal = { 'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9, 'k': 100, 'P' : -1, 'N' : -3, 'B' : -3, 'R' : -5, 'Q' : -9, 'K' : -100}
+  
+  for(var piece of layout){
+    if(pieceVal[piece]){
+      totalScore += (pieceVal[piece]*(side == 'w' ? -1 : 1))
+    }
+  }
+  return totalScore
+}</textarea>
+  <div class="code_options">
+      <button class="save_button" id="saveButton${id}" disabled onclick="saveBot('script${id}', ${id})">
+          <i style="margin-right: 5px;" class="fa-solid fa-save"></i> SAVE
+      </button>
+      <button class="template_button" onclick="openPopup(${id})">
+          <i style="margin-right: 5px;" class="fa-solid fa-file"></i> TEMPLATE
+      </button>
+      <button class="trash_button" onclick="trashCode(${id})">
+          <i style="margin-right: 5px;" class="fa-solid fa-trash"></i> TRASH
+      </button>
+  </div>
+  </div>`
+
+  document.getElementById('codeContainer').appendChild(HTMLToAdd)
+  document.getElementById(`codeInput${id}`).style.height = ""
+  document.getElementById(`codeInput${id}`).style.height = (document.getElementById(`codeInput${id}`).scrollHeight + 20) + "px"
+}
+function addNewMiscSection(id){
+  var HTMLToAdd = document.createElement('div')
+  HTMLToAdd.id = `codeSection${id}`
+  HTMLToAdd.innerHTML = `<div class="custom_bot_code_container" id="container${id}">
+  <input class="codeInputHeader" spellcheck="false" value="misc function">
+  <button class="collapse_button" onclick="collapseCode(${id})">
+          <i class="fa-solid fa-chevron-down"></i>
+  </button>
+  <textarea onchange="document.getElementById('saveButton${id}').disabled = false" id="codeInput${id}" class="code_input" spellcheck="false" cols="50" onkeydown="if(event.keyCode===9){var v=this.value,s=this.selectionStart,e=this.selectionEnd;this.value=v.substring(0, s)+'\t'+v.substring(e);this.selectionStart=this.selectionEnd=s+1;return false;}" oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'>
+function doSomething (gameState){
+  var something = "Hello World!"
+  return something
+}
+  </textarea>
+  <div class="code_options">
+      <button class="save_button" id="saveButton${id}" disabled onclick="saveBot('script${id}', ${id})">
+          <i style="margin-right: 5px;" class="fa-solid fa-save"></i> SAVE
+      </button>
+      <button class="template_button" onclick="openPopup(${id})">
+          <i style="margin-right: 5px;" class="fa-solid fa-file"></i> TEMPLATE
+      </button>
+      <button class="trash_button" onclick="trashCode(${id})">
+          <i style="margin-right: 5px;" class="fa-solid fa-trash"></i> TRASH
+      </button>
+  </div>
+  </div>`
+
+  document.getElementById('codeContainer').appendChild(HTMLToAdd)
+  document.getElementById(`codeInput${id}`).style.height = ""
+  document.getElementById(`codeInput${id}`).style.height = document.getElementById(`codeInput${id}`).scrollHeight + "px"
+}
+
+function trashBot(id, index){
+  var botNUM = index
+  var botContainer = document.getElementById('botContainer')
+  var createBotButton = document.getElementById('createBotButton')
+
+  var script = document.getElementById(`script${botNUM}`);
+  document.head.removeChild(script)
+  botContainer.removeChild(document.getElementById(id))
+
+  for(var i = 0; i < customBots.length; i++){
+    if(customBots[i].id == id) customBots.splice(i, 1)
+  }
+  document.getElementById('codeContainer').removeChild(document.getElementById(`codeSection${id}`))
+  botScriptCount--
+}
+function trashCode(index){
+  var script = document.getElementById(`script${index}`);
+  document.head.removeChild(script)
+
+  var codeValue = document.getElementById(`codeInput${index}`).value
+  if(index > 10000 && codeValue.includes("shuffle(array)")) shuffleScriptCount--
+
+  document.getElementById('codeContainer').removeChild(document.getElementById(`codeSection${index}`))
+
+  if(index < 10000) evalScriptCount--
+}
+
+function collapseCode(botNUM){
+  if(document.getElementById(`container${botNUM}`).classList.contains("custom_bot_code_container_collapsed")){
+    document.getElementById(`container${botNUM}`).classList.remove("custom_bot_code_container_collapsed")
+  }
+  else {
+    document.getElementById(`container${botNUM}`).classList.add("custom_bot_code_container_collapsed")
+  }
 }
 
 function updateBotName(botNUM){
@@ -663,9 +822,9 @@ function updateBotName(botNUM){
 }
 
 function moveCustomBot(){
-  side == "w" ? side = "b" : side = "w"
+  side = game.turn()
 
-  moveAI()
+  window.setTimeout(moveAI());
 
   if(!stopGame){
     window.setTimeout(moveCustomBot, 1000)
@@ -678,7 +837,6 @@ function moveCustomBot(){
 }
 
 function battleBots(){
-  resign()
   startButtonEle.disabled = true
   document.getElementById('botContainer').classList.add("no_access")
   side = "w"
@@ -696,6 +854,239 @@ function resign(){
     board = Chessboard('board', config)
     game = new Chess()
   }
+}
+
+
+var currentPopupIndex
+
+var botTemplates = [
+
+`function {BOTNAME}(possibleMoves, gameState){
+  //it calls this function for every move, so it returns a RANDOM move from the list of possible moves.
+  var i = Math.floor(Math.random()*possibleMoves.length)
+  return possibleMoves[i]
+}`,
+
+`function {BOTNAME}(possibleMoves, gameState){
+  //it calls this function for every move, so it returns a RANDOM move from the list of possible moves.
+  var bestMove = ""
+  var bestMoveEvaluation = -1000
+  var dummyGame = new Chess(gameState.fen())
+   
+  for(var i = 0; i < possibleMoves.length; i++){
+    dummyGame.move(possibleMoves[i])
+    var evaluation = evaluate(dummyGame )
+  
+    if(evaluation > bestMoveEvaluation) {
+      bestMove = possibleMoves[i]
+      bestMoveEvaluation = evaluation 
+    }
+    dummyGame.undo()
+  }
+  
+  return bestMove
+}`,
+
+`function {BOTNAME}(possibleMoves, gameState){
+  //it calls this function for every move, so it returns a RANDOM move from the list of possible moves.
+  possibleMoves = shuffle(possibleMoves)
+  var bestMove = ""
+  var bestMoveEvaluation = -1000
+  var dummyGame = new Chess(gameState.fen())
+   
+  for(var i = 0; i < possibleMoves.length; i++){
+    dummyGame.move(possibleMoves[i])
+    
+    var enemyPossibleMoves = dummyGame.moves()
+    enemyPossibleMoves = shuffle(enemyPossibleMoves)
+
+    var worstMoveEvaluation = 1000
+
+    for(var move of enemyPossibleMoves){
+      dummyGame.move(move)
+      var evaluation = evaluate(dummyGame)
+  
+      if(evaluation < worstMoveEvaluation) {
+        worstMoveEvaluation = evaluation 
+      }
+      dummyGame.undo()
+    }
+
+    if(worstMoveEvaluation > bestMoveEvaluation){
+      bestMove = possibleMoves[i]
+      bestMoveEvaluation = worstMoveEvaluation
+    }
+
+    dummyGame.undo()
+  }
+  
+  return bestMove
+}`,
+
+`function {BOTNAME}(possibleMoves, gameState){
+  //it calls this function for every move, so it returns a RANDOM move from the list of possible moves.
+  var bestMove = ""
+  var bestMoveEvaluation = -1000
+  var dummyGame = new Chess(gameState.fen())
+   
+  for(var i = 0; i < possibleMoves.length; i++){
+    dummyGame.move(possibleMoves[i])
+    var worstMoveEvaluation = 1000
+
+    for(var k = 0; i < dummyGame.moves().length; k++){
+      var evaluation = evaluate(dummyGame )
+  
+      if(evaluation < worstMoveEvaluation) {
+        worstMoveEvaluation = evaluation 
+      }
+      dummyGame.undo()
+    }
+
+    if(worstMoveEvaluation > bestMoveEvaluation){
+      bestMove = possibleMoves[i]
+      bestMoveEvaluation = worstMoveEvaluation
+    }
+
+    dummyGame.undo()
+  }
+  
+  return bestMove
+}`]
+var evalTemplates = [
+
+  `function evaluate (gameState){
+  var totalScore = 0
+  var layout = gameState.fen().split(" ")[0]
+  const pieceVal = { 'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9, 'k': 100, 'P' : -1, 'N' : -3, 'B' : -3, 'R' : -5, 'Q' : -9, 'K' : -100}
+  
+  for(var piece of layout){
+    if(pieceVal[piece]){
+      totalScore += (pieceVal[piece]*(side == 'w' ? -1 : 1))
+    }
+  }
+  return totalScore
+}`,
+  
+`function evaluate (gameState){
+  var totalScore = 0
+  var layout = gameState.fen().split(" ")[0]
+  const pieceVal = { 'p': 1, 'n': 3, 'b': 3, 'r': 5, 'q': 9, 'k': 100, 'P' : -1, 'N' : -3, 'B' : -3, 'R' : -5, 'Q' : -9, 'K' : -100}
+  
+  for(var piece of layout){
+    if(pieceVal[piece]){
+      totalScore += (pieceVal[piece]*(side == 'w' ? -1 : 1))
+    }
+  }
+  return totalScore
+}`]
+var miscTemplates = [
+
+`function shuffle(array) {
+  let currentIndex = array.length,  randomIndex;
+  
+  // While there remain elements to shuffle.
+  while (currentIndex > 0) {
+  
+    // Pick a remaining element.
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex--;
+  
+    // And swap it with the current element.
+    [array[currentIndex], array[randomIndex]] = [
+    array[randomIndex], array[currentIndex]];
+  }
+  
+  return array;
+}`,
+  
+`function findTile(move){
+  var res = ''
+  for(var digit of move){
+    if(digit.toUpperCase() != digit && digit != 'x'){
+      res += digit
+    }
+  }
+  return res
+}`]
+
+var botTemplateButtons = `<button class="template_button" onclick="setTemplate('bot', 0)">
+<i class="fa-solid fa-chess-pawn" style="margin-right: 5px;"></i> RANDOM
+</button>
+<button class="template_button" onclick="setTemplate('bot', 1)">
+<i class="fa-solid fa-chess-knight" style="margin-right: 5px;"></i> DEPTH 1
+</button>
+<button class="template_button" onclick="setTemplate('bot', 2)">
+<i class="fa-solid fa-chess-rook" style="margin-right: 5px;"></i> DEPTH 2
+</button>
+<button class="template_button" onclick="setTemplate('bot', 3)">
+<i class="fa-solid fa-chess-queen" style="margin-right: 5px;"></i> DEPTH 3
+</button>`
+var evalTemplateButtons = `<button class="template_button" onclick="setTemplate('eval', 0)">
+<i class="fa-solid fa-chess-pawn" style="margin-right: 5px;"></i> STANDARD
+</button>
+<button class="template_button" onclick="setTemplate('eval', 1)">
+<i class="fa-solid fa-chess-board" style="margin-right: 5px;"></i> POSITION
+</button>`
+var miscTemplateButtons = `<button class="template_button" onclick="setTemplate('misc', 0)">
+<i class="fa-solid fa-shuffle" style="margin-right: 5px;"></i> SHUFFLE
+</button>
+<button class="template_button" onclick="setTemplate('misc', 1)">
+<i class="fa-solid fa-magnifying-glass" style="margin-right: 5px;"></i> FIND TILE
+</button>`
+
+function openPopup(i){
+  currentPopupIndex = i
+  document.getElementById("templatesPopupContainer").classList.remove("hidden")
+  document.getElementById("mask").classList.remove("hidden")
+
+  if(i < 1000){
+    document.getElementById('popupBody').innerHTML = botTemplateButtons
+  }
+  else if(i < 100000){
+    document.getElementById('popupBody').innerHTML = evalTemplateButtons
+  } else {
+    document.getElementById('popupBody').innerHTML = miscTemplateButtons
+  }
+}
+function closePopup(){
+  document.getElementById("templatesPopupContainer").classList.add("hidden")
+  document.getElementById("mask").classList.add("hidden")
+}
+function setTemplate(type, index){
+  if(type == 'bot'){
+    var HTMLToAdd = botTemplates[index]
+    HTMLToAdd = HTMLToAdd.replace("{BOTNAME}", `bot${currentPopupIndex}`)
+    document.getElementById(`codeInput${currentPopupIndex}`).value = HTMLToAdd
+
+    document.getElementById(`codeInput${currentPopupIndex}`).style.height = ""
+    document.getElementById(`codeInput${currentPopupIndex}`).style.height = document.getElementById(`codeInput${currentPopupIndex}`).scrollHeight + "px"
+
+    if(index > 0 && evalScriptCount < 1){
+      createEval()
+    }
+
+    if(index > 1 && shuffleScriptCount < 1){
+      currentPopupIndex = createMisc()
+
+      setTemplate("misc", 0)
+    }
+  }
+  if(type == 'eval'){
+    var HTMLToAdd = evalTemplates[index]
+    document.getElementById(`codeInput${currentPopupIndex}`).value = HTMLToAdd
+  }
+
+  if(type == 'misc'){
+    var HTMLToAdd = miscTemplates[index]
+    document.getElementById(`codeInput${currentPopupIndex}`).value = HTMLToAdd
+
+    if(index == 0) shuffleScriptCount++
+  }
+
+  saveBot(`script${currentPopupIndex}`, currentPopupIndex)
+  document.getElementById(`codeInput${currentPopupIndex}`).style.height = ""
+  document.getElementById(`codeInput${currentPopupIndex}`).style.height = document.getElementById(`codeInput${currentPopupIndex}`).scrollHeight + "px"
+  closePopup()
 }
 // moveAI()
 // board.position(game.fen())
