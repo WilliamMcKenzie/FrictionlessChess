@@ -2,7 +2,7 @@ body {
     --background: #2C303B;
     --backgroundLight: #3b414f;
     --backgroundDark: #242832;
-    --primary: rgb(220, 225, 226);
+    --primary: rgb(180, 198, 201);
 
     --secondary: #767b82;
 
@@ -187,8 +187,7 @@ button:hover {
 }
 
 .code_container {
-    background-image: url('./img/light_wave.svg');
-    background-size: cover;
+    background: var(--backgroundLight);
     width: 100vw;
     min-height: 90vh;
     padding-bottom: 10vh;
@@ -225,9 +224,9 @@ button:hover {
 
     width: calc(70vh + 57.5vh - 20px);
     text-align: center;
-    
-    background-image: url('./img/black_wave.svg');
-    background-size: cover;
+    color: var(--primary);
+
+    background: var(--backgroundDark);
 }
 .code_container h1 a {
     color: var(--tertiary);
@@ -488,7 +487,6 @@ button:hover {
     box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 
     width: 50vh;
-    height: 60vh;
 
     transform: translate(-50%, -50%);
     z-index: 5;
@@ -496,7 +494,7 @@ button:hover {
 .templates_popup {
     position: relative;
     width: 50vh;
-    height: 60vh;
+    height: fit-content;
 
     display: flex;
     flex-direction: column;
