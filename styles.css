@@ -209,7 +209,7 @@ button:hover {
 
     overflow-y: scroll;
     overflow-x: hidden;
-    height: 30vh;
+    max-height: 30vh;
 }
 .bot_selection_container a {
     padding: 10px;
