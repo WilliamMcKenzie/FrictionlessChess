@@ -27,7 +27,8 @@ body {
 
 .hidden {
     visibility: hidden;
-    position: absolute !important;
+    position: fixed !important;
+    top: -1200vh;
 }
 
 button:hover {
@@ -47,6 +48,49 @@ button:hover {
     background-color: #717882 !important;
     color: #999da4 !important;
 }
+
+.side_bar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    background-color: var(--backgroundDark);
+    z-index: 3;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+.auth_start_element{
+    margin-top: 40px;
+}
+.auth_button {
+    color: #749da5 !important;
+}
+.side_bar div {
+    width: 10vw;
+    padding: 1vw;
+    
+    font-size: 1rem;
+    text-align:start;
+    color: var(--primary);
+    background-color: var(--backgroundDark);
+}
+.side_bar_navigation:hover {
+    cursor: pointer !important;
+    filter: brightness(1.2);
+}
+
+.side_bar_header {
+    font-weight: 600;
+    color: white !important;
+}
+
+.logo {
+    width: 7vw;
+}
+
 #bottomBoard {
     margin-top: 10px;
     padding-top: 10px;
@@ -105,7 +149,6 @@ button:hover {
 
 .icon_button:hover {
     filter: brightness(0.8);
-    border: 3px solid white;
 }
 
 .create_bot_button {
@@ -124,7 +167,6 @@ button:hover {
 
 .create_bot_button:hover{
     filter: brightness(1.2);
-    border: 3px solid white;
 }
 
 .selected_bot {
@@ -183,8 +225,51 @@ button:hover {
 }
 
 ::-webkit-scrollbar {
-    width: 0;
+    width: 0px;
 }
+.bot_selection_container::-webkit-scrollbar {
+    width: 15px !important;
+    border-right: 3px solid var(--backgroundDark);
+}
+.bot_selection_container::-webkit-scrollbar-track {
+    background: var(--backgroundDark) !important;
+}
+.bot_selection_container::-webkit-scrollbar-thumb {
+    background: var(--background) !important;
+    border-right: 5px solid var(--backgroundDark);
+    border-radius: 100px;
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    background-color: #fff;
+    margin: 0;
+    margin-left: 10px;
+    font: inherit;
+    color: currentColor;
+    width: 1.15em;
+    height: 1.15em;
+    border: 0.15em solid var(--backgroundDark);
+    border-radius: 1em;
+    transform: translateY(-0.075em);
+    display: grid;
+    place-content: center;
+  }
+  
+input[type="checkbox"]::before {
+    content: "";
+    width: 0.65em;
+    height: 0.65em;
+    border-radius: 1em;
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+    box-shadow: inset 1em 1em var(--tertiary);
+}
+  
+input[type="checkbox"]:checked::before {
+    transform: scale(1);
+}
+
 
 .code_container {
     background: var(--backgroundLight);
@@ -245,12 +330,9 @@ button:hover {
 
     margin: 5px;
     margin-top: 25px;
-
-    transition: 0.3s;
 }
 .code_button:hover {
     filter: brightness(1.2);
-    border: 3px solid white;
 }
 
 .code_button:disabled {
@@ -297,12 +379,9 @@ button:hover {
     position: absolute;
     top: 2.5px;
     right: 5px;
-
-    transition: 0.3s;
 }
 .collapse_button:hover {
     filter: brightness(1.2);
-    transform: rotate(180deg);
 }
 .codeInputHeader {
     outline: none;
@@ -372,13 +451,10 @@ button:hover {
 
     border-radius: 5px;
     font-size: 1rem;
-
-    transition: 0.3s;
 }
 
 .code_options button:hover {
     filter: brightness(1.2);
-    border: 3px solid white;
 }
 
 .code_options button:disabled {
@@ -404,13 +480,10 @@ button:hover {
 
     border-radius: 5px;
     font-size: 1rem;
-
-    transition: 0.3s;
 }
 
 .start_button:hover {
     filter: brightness(1.2);
-    border: 3px solid white;
 }
 
 .start_button:disabled {
@@ -437,13 +510,10 @@ button:hover {
 
     border-radius: 5px;
     font-size: 1rem;
-
-    transition: 0.3s;
 }
 
 .resign_button:hover {
     filter: brightness(1.2);
-    border: 3px solid white;
 }
 
 #restart {
@@ -459,13 +529,10 @@ button:hover {
 
     border-radius: 5px;
     font-size: 1rem;
-
-    transition: 0.3s;
 }
 
 #restart:hover {
     filter: brightness(1.2);
-    border: 3px solid white;
 }
 
 #restart:disabled {
@@ -547,7 +614,6 @@ button:hover {
 }
 .templates_popup_body button:hover {
     filter: brightness(1.2);
-    border: 3px solid white;
 }
 .templates_popup_footer {
     background-color: var(--backgroundDark);
@@ -587,6 +653,57 @@ button:hover {
     z-index: 4;
 }
 
+.bot_container {
+    margin-top: 20px;
+}
+
+.fen_container {
+    margin-top: 20px; 
+    position: relative;
+    background: var(--backgroundDark);
+    border-radius: 10px; 
+    border-bottom: 10px solid var(--backgroundDark);
+    border-top: 10px solid var(--backgroundDark);
+
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    padding: 10px;
+    padding-top: 50px;
+
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+.fen_container input {
+    font-family: 'code';
+    color: var(--primary);
+    background-color: var(--backgroundDark);
+    border-radius: 0;
+    border: 0;
+    outline: 0;
+    width: 460px;
+}
+.fen_container a {
+    padding: 10px;
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    width: calc(100% - 20px);
+
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    position: absolute;
+    top: 0;
+}
+
+.open_docs {
+    color: var(--backgroundLight);
+}
+.open_docs:hover {
+    color: var(--primary);
+    cursor: pointer;
+}
 @font-face {
     font-family: "code";
     src:
