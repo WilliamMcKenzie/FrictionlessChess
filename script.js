@@ -456,12 +456,16 @@ function saySomething(){
 }
 
 function restartGame(){
-  board = Chessboard('board', config)
   game = new Chess()
+  board.position(game.fen())
   document.getElementById('restart').disabled = true
+
 
   if(selectedBots[0].name != "You"){
      battleBots()
+  } else {
+    selectedBot = 0
+    console.log(selectedBots[selectedBot].function)
   }
 }
 
