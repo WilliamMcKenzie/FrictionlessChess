@@ -1,23 +1,39 @@
 body {
-    --background: #2C303B;
-    --backgroundLight: #3b414f;
-    --backgroundDark: #242832;
-    --primary: rgb(180, 198, 201);
-
-    --secondary: #767b82;
-
-    --tertiary: #00b4d8;
-
-
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     flex-direction: column;
     background-color: var(--background);
     color: white;
 
     margin: 0;
     padding: 0;
+}
+.dark {
+    --background: #2C303B;
+    --backgroundLight: #3b414f;
+    --backgroundDark: #242832;
+    --primary: rgb(180, 198, 201);
+
+    --secondary: rgba(20,66,173,1);
+    --secondaryLight: rgba(159,209,255,1);
+
+    --fontColor: rgb(203, 203, 203);
+
+    --tertiary: #00b4d8;
+}
+.light {
+    --background: #ffffff;
+    --backgroundLight: #e2e4e8;
+    --backgroundDark: #d6d7db;
+    --primary: rgb(180, 198, 201);
+
+    --secondary: rgba(20,66,173,1);
+    --secondaryLight: rgba(159,209,255,1);
+
+    --fontColor: rgb(0, 0, 0);
+
+    --tertiary: #00b4d8;
 }
 
 .no_access {
@@ -62,10 +78,9 @@ button:hover {
     justify-content: flex-start;
     align-items: center;
 }
-.auth_start_element{
-    margin-top: 40px;
-}
-.auth_button {
+.dark_mode{
+    margin-top: auto;
+    font-weight: 600;
     color: #749da5 !important;
 }
 .side_bar div {
@@ -166,7 +181,7 @@ button:hover {
 }
 
 .create_bot_button:hover{
-    filter: brightness(1.2);
+    filter: brightness(0.95);
 }
 
 .selected_bot {
@@ -263,7 +278,7 @@ input[type="checkbox"]::before {
     border-radius: 1em;
     transform: scale(0);
     transition: 120ms transform ease-in-out;
-    box-shadow: inset 1em 1em var(--tertiary);
+    box-shadow: inset 1em 1em var(--secondary);
 }
   
 input[type="checkbox"]:checked::before {
@@ -314,7 +329,7 @@ input[type="checkbox"]:checked::before {
     background: var(--backgroundDark);
 }
 .code_container h1 a {
-    color: var(--tertiary);
+    color: var(--secondary);
 }
 .code_button {
     font-weight: 600;
@@ -407,7 +422,7 @@ input[type="checkbox"]:checked::before {
 
     margin: 0;
     padding: 10px;
-    color: white;
+    color: var(--fontColor);;
     resize: none;
 
     font-family: 'code';
@@ -428,32 +443,33 @@ input[type="checkbox"]:checked::before {
 }
 
 .save_button {
-    background-color: #869b7a;
+    background-color: var(--backgroundDark);
 }
 
 .template_button {
-    background-color: #7a7b9b;
+    background-color: var(--backgroundDark);
     margin-left: 10px;
 }
 
 .trash_button {
     margin-left: auto!important;
-    background-color: #BB4430;
+    background-color: var(--backgroundDark);
 }
 
 .code_options button {
     font-weight: 600;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: white;
+    color: rgb(203, 203, 203);
     padding: 10px;
 
-    border: 3px solid transparent;
+    border: 2px solid transparent;
 
     border-radius: 5px;
     font-size: 1rem;
 }
 
 .code_options button:hover {
+    border: 2px solid var(--backgroundLight);
     filter: brightness(1.2);
 }
 
@@ -469,20 +485,21 @@ input[type="checkbox"]:checked::before {
 
 .start_button {
     margin-left: 10px;
-    background-color: #869b7a;
+    background-color: var(--backgroundDark);
 
     font-weight: 600;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: white;
+    color: var(--fontColor);;
     padding: 10px;
 
-    border: 3px solid transparent;
+    border: 2px solid transparent;
 
     border-radius: 5px;
     font-size: 1rem;
 }
 
 .start_button:hover {
+    border: 2px solid var(--backgroundLight);
     filter: brightness(1.2);
 }
 
@@ -499,39 +516,41 @@ input[type="checkbox"]:checked::before {
 .resign_button {
     margin-left: 10px;
     margin-right: 10px;
-    background-color: #BB4430;
+    background-color: var(--backgroundDark);
 
     font-weight: 600;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: white;
+    color: var(--fontColor);;
     padding: 10px;
 
-    border: 3px solid transparent;
+    border: 2px solid transparent;
 
     border-radius: 5px;
     font-size: 1rem;
 }
 
 .resign_button:hover {
+    border: 2px solid var(--backgroundLight);
     filter: brightness(1.2);
 }
 
 #restart {
     margin-left: auto;
-    background-color: #7a7b9b;
+    background-color: var(--backgroundDark);
 
     font-weight: 600;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: white;
+    color: var(--fontColor);
     padding: 10px;
 
-    border: 3px solid transparent;
+    border: 2px solid transparent;
 
     border-radius: 5px;
     font-size: 1rem;
 }
 
 #restart:hover {
+    border: 2px solid var(--backgroundLight);
     filter: brightness(1.2);
 }
 
@@ -577,7 +596,7 @@ input[type="checkbox"]:checked::before {
     width: 60%;
     height: 10vh;
 
-    background: linear-gradient(56deg, rgba(20,66,173,1) 0%, rgba(159,209,255,1) 100%);
+    background: linear-gradient(56deg, var(--secondary) 0%, var(--secondaryLight) 100%);
     box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
     padding: 20px;
 
@@ -607,12 +626,13 @@ input[type="checkbox"]:checked::before {
     color: white;
     padding: 10px;
 
-    border: 3px solid transparent;
+    border: 2px solid transparent;
 
     border-radius: 5px;
     font-size: 1rem;
 }
 .templates_popup_body button:hover {
+    border: 2px solid var(--backgroundLight);
     filter: brightness(1.2);
 }
 .templates_popup_footer {
@@ -632,10 +652,10 @@ input[type="checkbox"]:checked::before {
 
     font-weight: 600;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: white;
+    color: var(--fontColor);
     padding: 10px;
 
-    border: 3px solid transparent;
+    border: 2px solid transparent;
 
     border-radius: 5px;
     font-size: 1rem;
@@ -701,7 +721,7 @@ input[type="checkbox"]:checked::before {
     color: var(--backgroundLight);
 }
 .open_docs:hover {
-    color: var(--primary);
+    filter: brightness(1.5);
     cursor: pointer;
 }
 @font-face {

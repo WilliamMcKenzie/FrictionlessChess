@@ -169,7 +169,6 @@ function depthSearchMed(depth, originalDepth, algo, a, b){
 
   var moves = shuffle(algo.moves())
   var yourTurn = depth % 2 == 0 ? true : false
-  var savedGame = algo.fen()
 
   for(var i = 0; i < moves.length; i++){
     algo.move(moves[i])
@@ -610,6 +609,92 @@ var botScriptCount = 0
 var evalScriptCount = 0
 var shuffleScriptCount = 0
 
+var selectedAnalysisBot = addedBots[1]
+
+var analysisConfig = {
+  draggable: true,
+  position: game.fen(),
+  sparePieces: true,
+  onSnapEnd: onAnalysisDragMove
+}
+function onAnalysisDragMove (newLocation, oldLocation, source,
+  piece, position, orientation) {
+    analysisGame = new Chess(analysisBoard.fen() + ' w KQkq - 0 1')
+    document.getElementById("fen_ele").value = analysisGame.fen()
+}
+analysisBoard = Chessboard('analysisBoard', analysisConfig)
+var analysisGame = new Chess()
+
+function updateAnalysisBoard(){
+  var botContainer = document.getElementById('analysisBotContainer')
+  var createBotButton = document.getElementById('createAnalysisBotButton')
+
+  botContainer.innerHTML = `<a><p style="margin: 0; margin-right: auto;">ADDED BOTS</p></a>
+  <button class="icon_button" id='analysis1' onclick="activateAnalyisisBot(1)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat);">
+  </button>
+  <button class="icon_button" id='analysis2'onclick="activateAnalyisisBot(2)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=meditti);">
+  </button>
+  <button class="icon_button" id='analysis3' onclick="activateAnalyisisBot(3)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=hamza);">
+  </button>
+  <button class="icon_button" id='analysis4' onclick="activateAnalyisisBot(4)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=pooper);">
+  </button>
+  <button class="icon_button" id='analysis5' onclick="activateAnalyisisBot(5)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=earss);">
+  </button>
+  <button id="createAnalysisBotButton" class="create_bot_button" onclick="createBot()" style="background-image: url(https://cdn.pixabay.com/photo/2017/03/19/03/51/material-icon-2155448_1280.png);">
+      <i class="fa-solid fa-plus"></i>
+  </button>`
+
+  botContainer.removeChild(document.getElementById('createAnalysisBotButton'))
+  for(var bot of customBots){
+    var botHTML = document.createElement('button')
+    botHTML.classList.add('icon_button')
+    botHTML.style.backgroundImage = `url("https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}")`
+    botHTML.onclick = function() {activateCustomAnalysisBot(bot)}
+    botHTML.id = `analysis${bot.id}`
+
+    botContainer.appendChild(botHTML)
+  }
+  botContainer.appendChild(createBotButton)
+  document.getElementById(`analysis${selectedAnalysisBot.id}`).classList.add("selected_bot")
+}
+function activateAnalyisisBot(botID){
+  var oldClassList = document.getElementById(`analysis${selectedAnalysisBot.id}`).classList
+  var newClassList = document.getElementById(`analysis${botID}`).classList
+
+  newClassList.add('selected_bot')
+  oldClassList.remove('selected_bot')
+  selectedAnalysisBot = addedBots[botID]
+}
+function activateCustomAnalysisBot(bot){
+  var oldClassList = document.getElementById(`analysis${selectedAnalysisBot.id}`).classList
+  var newClassList = document.getElementById(`analysis${bot.id}`).classList
+
+  newClassList.add('selected_bot')
+  oldClassList.remove('selected_bot')
+  selectedAnalysisBot = bot
+}
+function evaluateAnalysisBoard(){
+  var optimalMove
+  var bot = selectedAnalysisBot
+
+  var temp = game.fen()
+  game = new Chess(analysisGame.fen())
+
+  if(bot.uniqueFunctionParams){
+    optimalMove = bot.function(game.moves(), game)
+  } else {
+    optimalMove = bot.function()
+  }
+
+  analysisGame.move(optimalMove)
+  analysisBoard.position(game.fen())
+  document.getElementById("fen_ele").value = analysisGame.fen()
+  game = new Chess(temp)
+}
+function resetAnalysisBoard(){
+  analysisBoard = Chessboard('analysisBoard', analysisConfig)
+}
+
 function createBot(){
   var botNUM = customBots.length+1
   var botContainer = document.getElementById('botContainer')
@@ -626,7 +711,6 @@ function createBot(){
   document.head.appendChild(script)
 
   var botID = Math.round(Math.random()*10000)
-  var functionReference = eval(`bot${botNUM}`)
   var bot = {name: `new bot ${botNUM}`, id: botID, num: botNUM, function: window[`bot${botNUM}`], uniqueFunctionParams: true, lines: ['Beep boop, calculating your defeat...', 'System overload!', 'How does the pawn move again?']}
 
   var botHTML = document.createElement('button')
@@ -642,6 +726,7 @@ function createBot(){
   customBots.push(bot)
   addNewCodeSection(bot)
   botScriptCount++
+  updateAnalysisBoard()
 }
 function createEval(){
   var evalNUM = Math.round((Math.random()+1)*1000)
@@ -1189,22 +1274,20 @@ function switchTabs(newTabID){
   document.getElementById(newTabID).classList.remove("hidden")
 }
 
-var analysisConfig = {
-  draggable: true,
-  position: 'start',
-  onDragMove: onAnalysisDragMove,
-  sparePieces: true
+function switchMode(mode){
+  if(mode == "light"){
+    document.getElementById(mode).classList.add("hidden")
+    document.getElementById("dark").classList.remove("hidden")
+    document.body.classList.add("light")
+    document.body.classList.remove("dark")
+  } 
+  else if(mode == "dark") {
+    document.getElementById(mode).classList.add("hidden")
+    document.getElementById("light").classList.remove("hidden")
+
+    document.body.classList.add("dark")
+    document.body.classList.remove("light")
+  }
 }
-function onAnalysisDragMove (newLocation, oldLocation, source,
-  piece, position, orientation) {
-console.log('New location: ' + newLocation)
-console.log('Old location: ' + oldLocation)
-console.log('Source: ' + source)
-console.log('Piece: ' + piece)
-console.log('Position: ' + Chessboard.objToFen(position))
-console.log('Orientation: ' + orientation)
-console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
-}
-analysisBoard = Chessboard('analysisBoard', analysisConfig)
 // moveAI()
 // board.position(game.fen())
