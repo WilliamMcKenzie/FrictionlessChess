@@ -451,7 +451,7 @@ function saySomething(){
   if(bot.faceCode) face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.faceCode}`
   else face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
 
-  robotNameEle.innerHTML = bot.name.toUpperCase()
+  robotNameEle.innerHTML = bot.name
 }
 
 function restartGame(){
@@ -546,8 +546,8 @@ function addPlayersToBoardAddon(){
     bottomFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[0].name}`
   }
 
-  topName.innerHTML = selectedBots[1].name.toUpperCase()
-  bottomName.innerHTML = selectedBots[0].name.toUpperCase()
+  topName.innerHTML = selectedBots[1].name
+  bottomName.innerHTML = selectedBots[0].name
 }
 
 function disableStart(){
@@ -560,7 +560,7 @@ function activateBot(botID){
   if(addedBots[botID].name == "You"){
     face.src = `https://api.dicebear.com/7.x/personas/svg?seed=Shadow`
 
-    robotNameEle.innerHTML = addedBots[botID].name.toUpperCase()
+    robotNameEle.innerHTML = addedBots[botID].name
     speech.innerHTML = "Let's do this!"
 
     alterSelectedBots(addedBots[botID])
@@ -571,7 +571,7 @@ function activateBot(botID){
 
   face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${addedBots[botID].faceCode}`
   speech.innerHTML = addedBots[botID].lines[0]
-  robotNameEle.innerHTML = addedBots[botID].name.toUpperCase()
+  robotNameEle.innerHTML = addedBots[botID].name
 
   alterSelectedBots(addedBots[botID])
   addPlayersToBoardAddon()
@@ -581,7 +581,7 @@ function activateBot(botID){
 function activateCustomBot(bot){
   face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
   speech.innerHTML = bot.lines[0]
-  robotNameEle.innerHTML = bot.name.toUpperCase()
+  robotNameEle.innerHTML = bot.name
   
   alterSelectedBots(bot)
   addPlayersToBoardAddon()

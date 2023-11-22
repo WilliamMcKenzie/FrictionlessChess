@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chess Bot Arena (CBA)</title>
+    <title>Chess Bot Arena</title>
     <link rel="icon" type="image/x-icon" href="img/favicon/android-chrome-192x192.png">
     <script defer src="script.js"></script>
     <script src="https://kit.fontawesome.com/350f22f69a.js" crossorigin="anonymous"></script>
@@ -13,7 +13,7 @@
       integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU"
       crossorigin="anonymous">
 </head>
-<body class="dark">
+<body class="light">
     <div class="side_bar">
         <div class="side_bar_header">
            CHESS BOT ARENA
@@ -30,24 +30,24 @@
         <div class="side_bar_navigation" onclick="switchTabs('position')">
             <i class="fa-solid fa-chess-board" style="margin-right: 10px;"></i><a>POSITIONS</a>
         </div>
-        <div id="dark" class="side_bar_navigation dark_mode hidden" onclick="switchMode('dark')">
+        <!-- <div id="dark" class="side_bar_navigation dark_mode hidden" onclick="switchMode('dark')">
             <i class="fa-solid fa-moon" style="margin-right: 10px;"></i><a>DARK MODE</a>
         </div>
         <div id="light" class="side_bar_navigation dark_mode" onclick="switchMode('light')">
             <i class="fa-solid fa-sun" style="margin-right: 10px;"></i><a>LIGHT MODE</a>
-        </div>
+        </div> -->
     </div>
     <div id="main" style="display: flex; margin-left: 15vw;">
         <div style="padding: 10px;
-        border-radius: 10px;">
+        border-radius: 10px; box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;">
             <div id="topBoard" class="board_addon" style="width: 70vh;">
                 <img id="topFace" src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat">
-                <p id="topName">POTLICK</p>
+                <p id="topName">Potlick</p>
             </div>
             <div id="board" style="width: 70vh"></div>
             <div id="bottomBoard" style="width: 69vh;" class="board_addon">
                 <img id="bottomFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow">
-                <p id="bottomName">YOU</p>
+                <p id="bottomName">You</p>
                 <button id="restart" onclick="restartGame()" disabled> <i class="fa-solid fa-rotate" style="margin-right: 5px;"></i>REMATCH</button>
                 <button class="start_button" id="startButton" disabled onclick="battleBots()"><i class="fa-solid fa-play"></i> RUN</button>
                 <button class="resign_button" onclick="resign()"><i class="fa-solid fa-flag"></i></button>
@@ -57,11 +57,11 @@
             <div style="display: flex; margin: auto;">
                 <img id="face" style="width: 80px; height: 80px;" src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat">
                 <div style="width: 250px; margin-top: 25px;">
-                    <div id="face_speechbox_container"> <a id="robot_name">POTLICK</a> <p id="face_speechbox">HAHAHA! lets play</p></div>
+                    <div id="face_speechbox_container"> <a id="robot_name" style="font-family: 'bold';">Potlick</a> <p id="face_speechbox">HAHAHA! lets play</p></div>
                 </div>
             </div>
             <div id="botContainer" class="bot_selection_container">
-                <a><p style="margin: 0;">ADDED BOTS</p> <p style="margin: 0; margin-left: auto; font-size: 0.8rem; font-weight: 500; display: flex; align-items: flex-end;">LOCK FIRST   <input id="lockFirst" style="margin-right: 10px;" checked type="checkbox" onchange="lockChange(1)"> LOCK SECOND<input id="lockSecond" type="checkbox" onchange="lockChange(2)"></p></a>
+                <a><p style="margin: 0; font-family: 'header_main'; font-size: 1.4rem;">Added Bots</p> <p style="margin: 0; margin-left: auto; font-size: 0.8rem; font-family: 'bold'; font-weight: 500; display: flex; align-items: flex-end;">LOCK FIRST   <input id="lockFirst" style="margin-right: 10px;" checked type="checkbox" onchange="lockChange(1)"> LOCK SECOND<input id="lockSecond" type="checkbox" onchange="lockChange(2)"></p></a>
                 <button class="icon_button selected_bot locked_bot" id='0' onclick="activateBot(0)" style="background-image: url(https://api.dicebear.com/7.x/personas/svg?seed=Shadow);">
                 </button>
                 <button class="icon_button selected_bot" id='1' onclick="activateBot(1)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat);">
@@ -118,14 +118,14 @@
         <div class="main_container">
             <div id="fenContainer" class="fen_container" style="margin-top: auto;">
                 <a><p style="margin: 0; margin-right: auto;">FEN</p> <p class="open_docs" onclick="window.open(`https://www.chessprogramming.org/Test-Positions`)" style="margin: 0; margin-left: auto; font-size: 0.8rem; font-weight: 500; display: flex; align-items: flex-end; text-wrap: nowrap; font-size: 1.5rem;"><i class="fa-solid fa-book" style="margin-right: 10px;"></i></button></p></a>
-                <input id="fen_ele" value="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR" spellcheck="false">
+                <input id="fen_ele" value="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR" onchange="updateFen()" spellcheck="false">
             </div>
             <div id="bottomBoard" style="width: 69vh;" class="board_addon">
                 <button class="start_button" id="evaluationButton" onclick="evaluateAnalysisBoard()" style="margin-left: 0;"><i class="fa-solid fa-play"></i> EVALUATE</button>
                 <button class="resign_button" onclick="resetAnalysisBoard()"><i class="fa-solid fa-rotate"></i></button>
             </div>
             <div id="analysisBotContainer" class="bot_container bot_selection_container">
-                <a><p style="margin: 0; margin-right: auto;">ADDED BOTS</p></a>
+                <a><p style="margin: 0; margin-right: auto; font-family: 'header_main'; font-size: 1.4rem;">ADDED BOTS</p></a>
                 <button class="icon_button selected_bot" id='analysis1' onclick="activateAnalyisisBot(1)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat);">
                 </button>
                 <button class="icon_button" id='analysis2'onclick="activateAnalyisisBot(2)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=meditti);">
