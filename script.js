@@ -629,31 +629,23 @@ function updateAnalysisBoard(){
   var botContainer = document.getElementById('analysisBotContainer')
   var createBotButton = document.getElementById('createAnalysisBotButton')
 
-  botContainer.innerHTML = `<a><p style="margin: 0; margin-right: auto;">ADDED BOTS</p></a>
-  <button class="icon_button" id='analysis1' onclick="activateAnalyisisBot(1)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat);">
-  </button>
-  <button class="icon_button" id='analysis2'onclick="activateAnalyisisBot(2)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=meditti);">
-  </button>
-  <button class="icon_button" id='analysis3' onclick="activateAnalyisisBot(3)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=hamza);">
-  </button>
-  <button class="icon_button" id='analysis4' onclick="activateAnalyisisBot(4)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=pooper);">
-  </button>
-  <button class="icon_button" id='analysis5' onclick="activateAnalyisisBot(5)" style="background-image: url(https://api.dicebear.com/7.x/bottts/svg?seed=earss);">
-  </button>
-  <button id="createAnalysisBotButton" class="create_bot_button" onclick="createBot()" style="background-image: url(https://cdn.pixabay.com/photo/2017/03/19/03/51/material-icon-2155448_1280.png);">
-      <i class="fa-solid fa-plus"></i>
-  </button>`
-
   botContainer.removeChild(document.getElementById('createAnalysisBotButton'))
-  for(var bot of customBots){
-    var botHTML = document.createElement('button')
-    botHTML.classList.add('icon_button')
-    botHTML.style.backgroundImage = `url("https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}")`
-    botHTML.onclick = function() {activateCustomAnalysisBot(bot)}
-    botHTML.id = `analysis${bot.id}`
 
-    botContainer.appendChild(botHTML)
+  var bot = customBots[customBots.length-1]
+  var botHTML = document.createElement('button')
+  var botIcon = document.createElement('img')
+    
+  botIcon.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
+  botHTML.appendChild(botIcon)
+
+  botHTML.classList.add('icon_button')
+  botHTML.onclick = function() {
+    activateCustomAnalysisBot(bot)
   }
+  botHTML.id = `analysis${bot.id}`
+
+  botContainer.appendChild(botHTML)
+
   botContainer.appendChild(createBotButton)
   document.getElementById(`analysis${selectedAnalysisBot.id}`).classList.add("selected_bot")
 }
@@ -661,16 +653,16 @@ function activateAnalyisisBot(botID){
   var oldClassList = document.getElementById(`analysis${selectedAnalysisBot.id}`).classList
   var newClassList = document.getElementById(`analysis${botID}`).classList
 
-  newClassList.add('selected_bot')
   oldClassList.remove('selected_bot')
+  newClassList.add('selected_bot')
   selectedAnalysisBot = addedBots[botID]
 }
 function activateCustomAnalysisBot(bot){
   var oldClassList = document.getElementById(`analysis${selectedAnalysisBot.id}`).classList
   var newClassList = document.getElementById(`analysis${bot.id}`).classList
 
-  newClassList.add('selected_bot')
   oldClassList.remove('selected_bot')
+  newClassList.add('selected_bot')
   selectedAnalysisBot = bot
 }
 function evaluateAnalysisBoard(){
@@ -687,12 +679,18 @@ function evaluateAnalysisBoard(){
   }
 
   analysisGame.move(optimalMove)
-  analysisBoard.position(game.fen())
+  analysisBoard.position(analysisGame.fen())
+  side = analysisGame.turn()
   document.getElementById("fen_ele").value = analysisGame.fen()
   game = new Chess(temp)
 }
 function resetAnalysisBoard(){
   analysisBoard = Chessboard('analysisBoard', analysisConfig)
+  side = analysisGame.turn()
+}
+function updateFen(){
+  analysisGame = new Chess(document.getElementById("fen_ele").value)
+  analysisBoard.position(analysisGame.fen())
 }
 
 function createBot(){
@@ -715,7 +713,9 @@ function createBot(){
 
   var botHTML = document.createElement('button')
   botHTML.classList.add('icon_button')
-  botHTML.style.backgroundImage = `url("https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}")`
+  var botIcon = document.createElement('img')
+  botIcon.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
+  botHTML.appendChild(botIcon)
   botHTML.onclick = function() {activateCustomBot(bot)}
   botHTML.id = botID
   
@@ -922,7 +922,8 @@ function moveCustomBot(){
   if(!stopGame){
     window.setTimeout(moveCustomBot, 1000)
   } else {
-    document.getElementById('botContainer').classList.remove("no_access")
+    document.getElementById('botContainer').classList.remove("no_opacity")
+    document.getElementById('main_info_container').classList.remove("no_access")
     startButtonEle.disabled = false
     stopGame = false 
     return
@@ -931,14 +932,15 @@ function moveCustomBot(){
 
 function battleBots(){
   startButtonEle.disabled = true
-  document.getElementById('botContainer').classList.add("no_access")
+  document.getElementById('botContainer').classList.add("no_opacity")
+  document.getElementById('main_info_container').classList.add("no_access")
   side = "w"
   moveAI()
   window.setTimeout(moveCustomBot, 1000)
 }
 
 function resign(){
-  if(document.getElementById('botContainer').classList.contains("no_access")){
+  if(document.getElementById('main_info_container').classList.contains("no_access")){
     stopGame = true
     startButtonEle.disabled = false
     document.getElementById('face_speechbox').innerHTML = 'Good game!'
@@ -1270,6 +1272,9 @@ function switchTabs(newTabID){
   document.getElementById("main").classList.add("hidden")
   document.getElementById("codeContainer").classList.add("hidden")
   document.getElementById("position").classList.add("hidden")
+
+  if(newTabID == "main") side = game.turn()
+  else side = analysisGame.turn()
 
   document.getElementById(newTabID).classList.remove("hidden")
 }
