@@ -27,8 +27,9 @@ body {
     --workShopMain: #4f5768;
     --workShopAlt: #2C303B;
 
-    --secondary: #1877F2;
+    --secondary: #5c84b9;
     --secondaryLight: #afd2ff;
+    --secondaryDark: #3d45a1;
     --fontColorBlend: #4f5768;
 
     --tertiary: #ffd8be;
@@ -55,6 +56,7 @@ body {
 
     --secondary: #1877F2;
     --secondaryLight: #afd2ff;
+    --secondaryDark: rgb(24, 28, 242);
     --fontColorBlend: #b4b4b7;
 
     --tertiary: #ffd8be;

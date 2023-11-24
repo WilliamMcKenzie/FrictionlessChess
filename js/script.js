@@ -89,6 +89,7 @@ function evaluateLocal(gameToEval, side, fen){
 }
 //group all bot functions 
 //(move generation, board evaluation, and whatever else user creates) into 1 variable
+//to later send to worker file
 function gatherFunctions(){
   var functions = [homoFunction, sanderFunction, barleyFunction, chesterFunction, makeRandomMove, depthSearch, depthSearchMed, getBestMove, evaluateLocal, findTile, shuffle]
   for(var customBot of customBots){
@@ -109,10 +110,12 @@ async function moveAI () {
   optimalMove = result
 
   //move piece, update board, & have bot say dialogue
-  game.move(optimalMove)
-  board.position(game.fen())
-  saySomething()
-  checkGameOver()
+  if(!stopGame){
+    game.move(optimalMove)
+    board.position(game.fen())
+    saySomething()
+    checkGameOver()
+  }
 
   selectedBot == 0 ? selectedBot = 1 : selectedBot = 0
 }
@@ -125,17 +128,13 @@ function checkGameOver(){
     resign()
   }
 }
-function moveCustomBot(){
+async function moveCustomBot(){
   side = game.turn()
-  moveAI()
+  await moveAI()
 
   if(!stopGame){
     window.setTimeout(moveCustomBot, 1000)
   } else {
-    document.getElementById('botContainer').classList.remove("no_opacity")
-    document.getElementById('main_info_container').classList.remove("no_access")
-    startButtonEle.disabled = false
-    stopGame = false 
     return
   }
 }
@@ -428,6 +427,8 @@ function evaluateAnalysisBoard(){
   game = new Chess(temp)
 }
 
+//to create and attatch the script tag
+//along with user code to document.head
 function createBot(){
   var botIndex = customBots.length+1
 
@@ -508,6 +509,11 @@ function resign(){
     startButtonEle.disabled = false
     document.getElementById('face_speechbox').innerHTML = 'Good game!'
     document.getElementById('restart').disabled = false
+
+    document.getElementById('botContainer').classList.remove("no_opacity")
+    document.getElementById('main_info_container').classList.remove("no_access")
+    startButtonEle.disabled = false
+    stopGame = false 
   } else {
     board = Chessboard('board', config)
     game = new Chess()

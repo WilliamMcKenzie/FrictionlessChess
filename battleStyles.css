@@ -1,0 +1,44 @@
+#roomContainer button {
+    border: 0;
+    border-bottom: 5px solid var(--secondaryDark);
+    border-radius: 5px;
+    padding: 15px;
+    background: var(--secondary);
+
+    font-family: 'header_main';
+    font-size: 1.2rem;
+    color: white;
+}
+#roomContainer button:hover {
+    filter: brightness(1.2);
+}
+#roomContainer button:disabled {
+    filter: opacity(0.5);
+    cursor: not-allowed;
+}
+#roomNumber {
+    border: 0;
+    border-bottom: 5px solid var(--secondaryDark);
+    border-radius: 5px;
+    padding: 15px;
+    background: var(--secondary);
+
+    font-family: 'header_main';
+    font-size: 1.2rem;
+    color: white;
+}
+#roomRequest{
+    border: 0;
+    border-bottom: 5px solid var(--secondaryDark);
+    border-radius: 5px;
+    padding: 15px;
+    background: var(--secondary);
+
+    font-family: 'header_main';
+    font-size: 1.2rem;
+    color: white;
+    outline: 0;
+}
+#roomRequest::placeholder {
+    color: var(--secondaryLight);
+}

@@ -12,6 +12,7 @@
     <script defer src="./js/battle.js"></script>
     <script src="https://kit.fontawesome.com/350f22f69a.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="battleStyles.css">
     <link rel="stylesheet"
       href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
       integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU"
@@ -26,7 +27,7 @@
             <i class="fa-solid fa-home" style="margin-right: 10px;"></i><a>MAIN</a>
         </div>
         <div class="side_bar_navigation unselectable" onclick="switchTabs('battle')">
-            <i class="fa-solid fa-chess" style="margin-right: 10px;"></i><a>BATTLE</a>
+            <i class="fa-solid fa-chess" style="margin-right: 10px;"></i><a>MULTIPLAYER</a>
         </div>
         <div class="side_bar_navigation unselectable" onclick="switchTabs('codeContainer')">
             <i class="fa-solid fa-screwdriver-wrench" style="margin-right: 10px;"></i><a>WORKSHOP</a>
@@ -44,8 +45,8 @@
             <i class="fa-solid fa-sun" style="margin-right: 10px;"></i><a>LIGHT MODE</a>
         </div>
     </div>
-    <div id="main" style="display: flex; margin-left: 20vw;">
-        <div id="topBoard" class="board_addon" style="width: 80vh; position: absolute; left: calc(20vw + 10px); top: 1vh;">
+    <div id="main" class="hidden" style="display: flex; margin-left: 20rem;">
+        <div id="topBoard" class="board_addon" style="width: 80vh; position: absolute; left: calc(20rem + 10px); top: 1vh;">
             <img id="topFace" src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat">
             <p id="topName">Potlick</p>
         </div>
@@ -94,8 +95,8 @@
             </div>
         </div>
     </div>
-    <div id="battle" class="hidden" style="display: flex; margin-left: 20vw;">
-        <div id="topBoard" class="board_addon" style="width: 80vh; position: absolute; left: calc(20vw + 10px); top: 1vh;">
+    <div id="battle" style="display: flex; margin-left: 20rem;">
+        <div id="topBoard" class="board_addon" style="width: 80vh; position: absolute; left: calc(20rem + 10px); top: 1vh;">
             <img id="topFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Felix">
             <p id="topName">Felix <a style="font-size: 1rem; color: var(--fontColorBlend);">(120 ELO)</a></p>
         </div>
@@ -108,20 +109,32 @@
                 <button class="resign_button" style="margin-left: auto;" onclick="resign()"><i class="fa-solid fa-flag"></i></button>
             </div>
         </div>
-        <div id="main_info_container" class="main_container" style="margin-left: 20px; margin-top: 20px;">
-            <div style="display: flex; flex-direction: column; align-items: center; margin: auto; padding-bottom: 50px;
+        <div id="main_info_container" class="main_container" style="margin-left: 20px; margin-top: 20px; position: relative;">
+            <p style="font-size: 2rem; font-family: 'header_main'; color: var(--fontColorBlend); position: absolute; top: 0; left: 50%; transform: translate(-50%, 0);">Rooms</p>
+            <div id="roomContainer" style="position: relative; display: flex; flex-direction: column; align-items: center; margin: auto; padding-bottom: 50px;
             border-bottom: 2px solid var(--background);
             width: 99%;">
-                <img id="face" style="width: 80px; height: 80px;" src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat">
-                <a id="robot_name" style="font-family: 'header_main'; color: var(--secondary); font-size: 1.4rem; font-weight: 400;">Potlick</a> 
-                <p id="face_speechbox" style="color: var(--fontColor);">HAHAHA! lets play</p>
+                <div id="roomMenu">
+                    <button onclick="createRoom()">Create Room</button>
+                    <button onclick="joinRoom()">Enter Code</button>
+                </div>
+                <div id="roomCreated" class="hidden">
+                    <button onclick="backRoom()" style="position: absolute; top: 0; left: 0;"><i class="fa-solid fa-left-long"></i></button>
+                    <p id="roomNumber" style="font-family: 'header_main'; font-size: 1.2rem; display: inline;">Code: 1234</p>
+                    <button onclick="submitCode()" disabled>Start</button>
+                </div>
+                <div id="roomJoin" class="hidden">
+                    <button onclick="backRoom()" style="position: absolute; top: 0; left: 0;"><i class="fa-solid fa-left-long"></i></button>
+                    <input placeholder="Enter your code" id="roomRequest">
+                    <button onclick="submitCode()">Confirm</button>
+                </div>
             </div>
             <div id="botContainer" class="bot_selection_container">
-                <a><p style="margin: 0; font-family: 'header_main'; font-size: 1.4rem;">Added Bots</p> <p style="margin: 0; margin-left: auto; font-size: 0.8rem; font-family: 'bold'; font-weight: 500; display: flex; align-items: flex-end;">LOCK FIRST   <input id="lockFirst" style="margin-right: 10px;" checked type="checkbox" onchange="lockChange(1)"> LOCK SECOND<input id="lockSecond" type="checkbox" onchange="lockChange(2)"></p></a>
-                <button class="icon_button selected_bot locked_bot" id='0' onclick="activateBot(0)">
+                <a><p style="margin: 0; margin-right: auto; font-family: 'header_main'; font-size: 1.4rem;">Added Bots</p> </a>
+                <button class="icon_button selected_bot" id='0' onclick="activateBot(0)">
                     <img src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow" style="border-radius: 5px; padding: 5px;">
                 </button>
-                <button class="icon_button selected_bot" id='1' onclick="activateBot(1)">
+                <button class="icon_button" id='1' onclick="activateBot(1)">
                     <img src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat" style="border-radius: 5px; padding: 5px;">
                 </button>
                 <button class="icon_button" id='2'onclick="activateBot(2)">
@@ -172,7 +185,7 @@
             </div>  
         </div>
     </div>
-    <div id="position" class="hidden" style="display: flex; margin-left: 20vw; margin-top: 5vh;">
+    <div id="position" class="hidden" style="display: flex; margin-left: 20rem; margin-top: 5vh;">
         <div style="padding: 10px;
         border-radius: 10px;">
             <div id="analysisBoard" style="width: 70vh"></div>
