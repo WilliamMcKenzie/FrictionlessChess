@@ -87,16 +87,23 @@ button:hover {
     cursor: pointer;
 }
 
+#main .chessboard-63f37 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
 .board-b72b1 {
     border: 0 !important;
     border-radius: 10px;
     overflow: hidden;
 }
-.white-1e1d7 {
+.dark .white-1e1d7 {
     background-color: #999da4 !important;
     color: #5c626b !important;
 }
-.black-3c85d {
+.dark .black-3c85d {
     background-color: #717882 !important;
     color: #999da4 !important;
 }
@@ -238,10 +245,10 @@ button:hover {
 }
 
 .selected_bot {
-    border: 3px solid var(--secondaryLight);
+    border: 3px solid rgba(24, 119, 242, 0.5);
 }
 .selected_bot img {
-    background-color: rgba(172, 208, 255, 0.25);
+    background-color: rgba(24, 119, 242, 0.1);
 }
 .locked_bot {
     border: 3px solid var(--secondary);
@@ -684,13 +691,14 @@ input[type="checkbox"]:checked::before {
     margin-top: 20px; 
     position: relative;
     background: var(--background);
-    border-radius: 10px; 
+    border-radius: 30px; 
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
     border-bottom: 10px solid var(--backgroundLight);
-    border-top: 10px solid var(--backgroundLight);
 
     display: grid;
     grid-template-columns: auto auto auto auto;
-    padding: 10px;
+    padding: 20px;
     padding-top: 50px;
     color: var(--fontColor);
 

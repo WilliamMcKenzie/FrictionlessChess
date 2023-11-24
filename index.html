@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chess Bot Arena</title>
     <link rel="icon" type="image/x-icon" href="img/favicon/android-chrome-192x192.png">
-    <script defer src="script.js"></script>
+    <script defer src="./js/data.js"></script>
+    <script defer src="./js/ai.js"></script>
+    <script defer src="./js/dom.js"></script>
+    <script defer src="./js/script.js"></script>
     <script src="https://kit.fontawesome.com/350f22f69a.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet"
@@ -43,8 +46,8 @@
             <p id="topName">Potlick</p>
         </div>
         <div style="padding: 10px;
-        border-radius: 10px; box-shadow: var(--boxShadow) 0px 3px 8px; margin-top: 10vh; background-color: var(--backgroundLight);">
-            <div id="board" style="width: 70vh"></div>
+        border-radius: 10px; margin-top: 10vh; background-color: var(--backgroundLight);">
+            <div id="board" style="width: 71vh"></div>
             <div id="bottomBoard" style="width: 69vh;" class="board_addon">
                 <img id="bottomFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow">
                 <p id="bottomName">You</p>
@@ -123,11 +126,11 @@
             <div id="analysisBoard" style="width: 70vh"></div>
         </div>
         <div class="main_container">
-            <div id="fenContainer" class="fen_container" style="margin-top: auto;">
+            <div id="fenContainer" class="fen_container" style="margin-top: 0;">
                 <a><p style="margin: 0; margin-right: auto;">FEN</p> <p class="open_docs" onclick="window.open(`https://www.chessprogramming.org/Test-Positions`)" style="margin: 0; margin-left: auto; font-size: 0.8rem; font-weight: 500; display: flex; align-items: flex-end; text-wrap: nowrap; font-size: 1.5rem;"><i class="fa-solid fa-book" style="margin-right: 10px; color: var(--fontColor);"></i></button></p></a>
                 <input id="fen_ele" value="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" onchange="updateFen()" spellcheck="false">
             </div>
-            <div id="analysisBotContainer" class="bot_container bot_selection_container">
+            <div id="analysisBotContainer" class="bot_container bot_selection_container" style="margin-top: auto;">
                 <a><p style="margin: 0; margin-right: auto; font-family: 'header_main'; font-size: 1.4rem;">ADDED BOTS</p></a>
                 <button class="icon_button selected_bot" id='analysis1' onclick="activateAnalyisisBot(1)">
                     <img src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat" style="border-radius: 5px; padding: 5px;">
