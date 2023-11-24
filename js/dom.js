@@ -268,6 +268,7 @@ function switchTabs(newTabID){
   document.getElementById("main").classList.add("hidden")
   document.getElementById("codeContainer").classList.add("hidden")
   document.getElementById("position").classList.add("hidden")
+  document.getElementById("battle").classList.add("hidden")
 
   if(newTabID == "main") side = game.turn()
   else side = analysisGame.turn()

@@ -9,6 +9,7 @@
     <script defer src="./js/ai.js"></script>
     <script defer src="./js/dom.js"></script>
     <script defer src="./js/script.js"></script>
+    <script defer src="./js/battle.js"></script>
     <script src="https://kit.fontawesome.com/350f22f69a.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet"
@@ -33,6 +34,9 @@
         <div class="side_bar_navigation unselectable" onclick="switchTabs('position')">
             <i class="fa-solid fa-chess-board" style="margin-right: 10px;"></i><a>POSITIONS</a>
         </div>
+        <div class="side_bar_navigation unselectable" onclick="window.open(`https://estrogenicfreeitems.com/`)">
+            <i class="fa-solid fa-shopping-cart" style="margin-right: 10px;"></i><a>MERCH</a>
+        </div>
         <div id="dark" class="side_bar_navigation dark_mode unselectable" onclick="switchMode('dark')">
             <i class="fa-solid fa-moon" style="margin-right: 10px;"></i><a>DARK MODE</a>
         </div>
@@ -54,6 +58,54 @@
                 <button id="restart" onclick="restartGame()" disabled> <i class="fa-solid fa-rotate" style="margin-right: 5px;"></i>REMATCH</button>
                 <button class="start_button" id="startButton" disabled onclick="battleBots()"><i class="fa-solid fa-play" style="margin-right: 5px;"></i>RUN</button>
                 <button class="resign_button" onclick="resign()"><i class="fa-solid fa-flag"></i></button>
+            </div>
+        </div>
+        <div id="main_info_container" class="main_container" style="margin-left: 20px; margin-top: 20px;">
+            <div style="display: flex; flex-direction: column; align-items: center; margin: auto; padding-bottom: 50px;
+            border-bottom: 2px solid var(--background);
+            width: 99%;">
+                <img id="face" style="width: 80px; height: 80px;" src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat">
+                <a id="robot_name" style="font-family: 'header_main'; color: var(--secondary); font-size: 1.4rem; font-weight: 400;">Potlick</a> 
+                <p id="face_speechbox" style="color: var(--fontColor);">HAHAHA! lets play</p>
+            </div>
+            <div id="botContainer" class="bot_selection_container">
+                <a><p style="margin: 0; font-family: 'header_main'; font-size: 1.4rem;">Added Bots</p> <p style="margin: 0; margin-left: auto; font-size: 0.8rem; font-family: 'bold'; font-weight: 500; display: flex; align-items: flex-end;">LOCK FIRST   <input id="lockFirst" style="margin-right: 10px;" checked type="checkbox" onchange="lockChange(1)"> LOCK SECOND<input id="lockSecond" type="checkbox" onchange="lockChange(2)"></p></a>
+                <button class="icon_button selected_bot locked_bot" id='0' onclick="activateBot(0)">
+                    <img src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow" style="border-radius: 5px; padding: 5px;">
+                </button>
+                <button class="icon_button selected_bot" id='1' onclick="activateBot(1)">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat" style="border-radius: 5px; padding: 5px;">
+                </button>
+                <button class="icon_button" id='2'onclick="activateBot(2)">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=meditti" style="border-radius: 5px; padding: 5px;">
+                </button>
+                <button class="icon_button" id='3' onclick="activateBot(3)">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=hamza" style="border-radius: 5px; padding: 5px;">
+                </button>
+                <button class="icon_button" id='4' onclick="activateBot(4)">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=pooper" style="border-radius: 5px; padding: 5px;">
+                </button>
+                <button class="icon_button" id='5' onclick="activateBot(5)">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=earss" style="border-radius: 5px; padding: 5px;">
+                </button>
+                <button id="createBotButton" class="create_bot_button" onclick="createBot()" style="background-image: url(https://cdn.pixabay.com/photo/2017/03/19/03/51/material-icon-2155448_1280.png);">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="battle" class="hidden" style="display: flex; margin-left: 20vw;">
+        <div id="topBoard" class="board_addon" style="width: 80vh; position: absolute; left: calc(20vw + 10px); top: 1vh;">
+            <img id="topFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Felix">
+            <p id="topName">Felix <a style="font-size: 1rem; color: var(--fontColorBlend);">(120 ELO)</a></p>
+        </div>
+        <div style="padding: 10px;
+        border-radius: 10px; margin-top: 10vh; background-color: var(--backgroundLight);">
+            <div id="battleBoard" style="width: 71vh"></div>
+            <div id="bottomBoard" style="width: 69vh;" class="board_addon">
+                <img id="bottomFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow">
+                <p id="bottomName">You <a style="font-size: 1rem; color: var(--backgroundDark);">(120 ELO)</a></p>
+                <button class="resign_button" style="margin-left: auto;" onclick="resign()"><i class="fa-solid fa-flag"></i></button>
             </div>
         </div>
         <div id="main_info_container" class="main_container" style="margin-left: 20px; margin-top: 20px;">

@@ -90,7 +90,7 @@ button:hover {
 #main .chessboard-63f37 {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 
