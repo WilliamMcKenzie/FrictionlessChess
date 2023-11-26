@@ -127,7 +127,7 @@ button:hover {
 .dark_mode{
     margin-top: auto;
     font-weight: 500;
-    color: #c6d3d5 !important;
+    color: #6e7c7d !important;
 }
 .light_mode{
     margin-top: auto;
@@ -706,9 +706,7 @@ input[type="checkbox"]:checked::before {
     margin-top: 20px; 
     position: relative;
     background: var(--secondary);
-    border-radius: 30px; 
-    border-top-right-radius: 5px;
-    border-top-left-radius: 5px;
+    border-radius: 20px; 
     border-bottom: 10px solid var(--secondaryDark);
 
     display: flex;
