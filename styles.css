@@ -1,7 +1,7 @@
 body {
     font-family: 'main';
     display: flex;
-    align-items: flex-start;
+    align-items: flex-end;
     flex-direction: column;
     background-color: white;
     color: white;
@@ -268,6 +268,7 @@ button:hover {
 
 .main_container {
     max-height: calc(69vh + 50px + 140px);
+    height: 100vw;
     background: var(--botSelectionBG);
     background-size: cover;
     display: flex; 
@@ -275,6 +276,8 @@ button:hover {
     border-radius: 10px; 
     padding: 10px;
     padding-bottom: 0;
+    margin-bottom: 10px;
+    margin-right: 30px;
 }
 
 .bot_selection_container {
@@ -474,12 +477,15 @@ input[type="checkbox"]:checked::before {
 
     margin: 0;
     padding: 10px;
-    color: var(--fontColor);
+    color: var(--fontColorBlend);
     resize: none;
     font-family: 'code';
 
 
     width: calc(70vh + 57.5vh - 20px);
+}
+.codeInputHeader:focus {
+    color: var(--secondary);
 }
 .code_input {
     outline: none;
@@ -488,7 +494,7 @@ input[type="checkbox"]:checked::before {
 
     margin: 0;
     padding: 10px;
-    color: var(--fontColor);;
+    color: var(--fontColor);
     resize: none;
 
     font-family: 'code';
@@ -605,16 +611,22 @@ input[type="checkbox"]:checked::before {
     left: 50%;
     transform: translate(-50%, 0);
 
-    width: 60%;
-    height: 10vh;
+    width: 40%;
+    height: 6vh;
 
     background: linear-gradient(56deg, var(--secondary) 0%, var(--secondaryLight) 100%);
-    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
-    padding: 20px;
+    border-bottom: 4px solid var(--backgroundLight);
+    padding: 20px;  
 
-    font-size: 3rem;
+    font-family: 'header_main';
+    font-size: 2rem;
     text-align: center;
+    line-height: 100%;
     border-radius: 10px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .templates_popup_body {
     padding: 2vh;
@@ -631,24 +643,25 @@ input[type="checkbox"]:checked::before {
     height: 10vh;
     margin: 10px;
 
-    background-color: var(--backgroundLight);
+    background-color: transparent;
 
     font-weight: 500;
-    font-family: 'main';
-    color: white;
+    font-family: 'bold';
+    color: var(--fontColorBlend);
     padding: 10px;
 
-    border: 2px solid transparent;
+    border: 3px solid var(--background);
 
     border-radius: 5px;
     font-size: 1rem;
 }
 .templates_popup_body button:hover {
-    border: 2px solid var(--backgroundLight);
-    filter: brightness(1.2);
+    background: linear-gradient(56deg, var(--secondary) 0%, var(--secondaryLight) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 .templates_popup_footer {
-    background-color: var(--backgroundDark);
+    background-color: transparent;
     width: calc(100% - 20px);
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
@@ -664,7 +677,7 @@ input[type="checkbox"]:checked::before {
 
     font-weight: 500;
     font-family: 'main';
-    color: var(--fontColor);
+    color: var(--secondary);
     padding: 10px;
 
     border: 2px solid transparent;
@@ -692,29 +705,31 @@ input[type="checkbox"]:checked::before {
 .fen_container {
     margin-top: 20px; 
     position: relative;
-    background: var(--background);
+    background: var(--secondary);
     border-radius: 30px; 
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
-    border-bottom: 10px solid var(--backgroundLight);
+    border-bottom: 10px solid var(--secondaryDark);
 
-    display: grid;
-    grid-template-columns: auto auto auto auto;
+    display: flex;
+    justify-content: center;
     padding: 20px;
     padding-top: 50px;
-    color: var(--fontColor);
+    color: white;
 
     overflow-y: scroll;
     overflow-x: hidden;
 }
 .fen_container input {
     font-family: 'code';
-    color: var(--fontColor);
-    background: var(--background);
+    color: var(--secondaryLight);
+    background: var(--secondaryDark);
     border-radius: 0;
     border: 0;
     outline: 0;
-    width: 460px;
+    width: 400px;
+    padding: 10px;
+    border-radius: 10px;
 }
 .fen_container a {
     padding: 10px;
@@ -726,13 +741,13 @@ input[type="checkbox"]:checked::before {
     font-size: 1.4rem;
     font-weight: 500;
     font-family: 'header_main';
-    color: var(--fontColor);
+    color: white;
     position: absolute;
     top: 0;
 }
 
 .open_docs {
-    color: var(--backgroundLight);
+    color: white;
 }
 .open_docs:hover {
     filter: brightness(1.5);

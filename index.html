@@ -26,9 +26,9 @@
         <div class="side_bar_navigation unselectable" onclick="switchTabs('main')">
             <i class="fa-solid fa-home" style="margin-right: 10px;"></i><a>MAIN</a>
         </div>
-        <div class="side_bar_navigation unselectable" onclick="switchTabs('battle')">
+        <!-- <div class="side_bar_navigation unselectable" onclick="switchTabs('battle')">
             <i class="fa-solid fa-chess" style="margin-right: 10px;"></i><a>MULTIPLAYER</a>
-        </div>
+        </div> -->
         <div class="side_bar_navigation unselectable" onclick="switchTabs('codeContainer')">
             <i class="fa-solid fa-screwdriver-wrench" style="margin-right: 10px;"></i><a>WORKSHOP</a>
         </div>
@@ -45,23 +45,25 @@
             <i class="fa-solid fa-sun" style="margin-right: 10px;"></i><a>LIGHT MODE</a>
         </div>
     </div>
-    <div id="main" class="hidden" style="display: flex; margin-left: 20rem;">
-        <div id="topBoard" class="board_addon" style="width: 80vh; position: absolute; left: calc(20rem + 10px); top: 1vh;">
-            <img id="topFace" src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat">
-            <p id="topName">Potlick</p>
+    <div id="main" style="display: flex; width: 100vw; align-items: flex-end;">
+        <div style="width: 10vw; height: 100vh; margin-left: auto;">
+
         </div>
         <div style="padding: 10px;
-        border-radius: 10px; margin-top: 10vh; background-color: var(--backgroundLight);">
+        border-radius: 10px; margin-top: 10vh; margin-bottom: 10px; margin-left: auto; margin-right: 20px; background-color: var(--backgroundLight); position: relative;">
+            <div id="topBoard" class="board_addon" style="width: 80vh; position: absolute; top: -8vh;">
+                <img id="topFace" src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat">
+                <p id="topName">Potlick</p>
+            </div>
             <div id="board" style="width: 71vh"></div>
             <div id="bottomBoard" style="width: 69vh;" class="board_addon">
                 <img id="bottomFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow">
                 <p id="bottomName">You</p>
-                <button id="restart" onclick="restartGame()" disabled> <i class="fa-solid fa-rotate" style="margin-right: 5px;"></i>REMATCH</button>
-                <button class="start_button" id="startButton" disabled onclick="battleBots()"><i class="fa-solid fa-play" style="margin-right: 5px;"></i>RUN</button>
+                <button class="start_button" id="startButton" style="margin-left: auto;" disabled onclick="battleBots()"><i class="fa-solid fa-play" style="margin-right: 5px;"></i>RUN</button>
                 <button class="resign_button" onclick="resign()"><i class="fa-solid fa-flag"></i></button>
             </div>
         </div>
-        <div id="main_info_container" class="main_container" style="margin-left: 20px; margin-top: 20px;">
+        <div id="main_info_container" class="main_container" style=" margin-top: 20px; margin-right: auto;">
             <div style="display: flex; flex-direction: column; align-items: center; margin: auto; padding-bottom: 50px;
             border-bottom: 2px solid var(--background);
             width: 99%;">
@@ -95,22 +97,26 @@
             </div>
         </div>
     </div>
-    <div id="battle" style="display: flex; margin-left: 20rem;">
-        <div id="topBoard" class="board_addon" style="width: 80vh; position: absolute; left: calc(20rem + 10px); top: 1vh;">
-            <img id="topFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Felix">
-            <p id="topName">Felix <a style="font-size: 1rem; color: var(--fontColorBlend);">(120 ELO)</a></p>
+    <div id="battle" class="hidden" style="display: flex; width: 100vw; align-items: flex-end;">
+        <div style="width: 10vw; height: 100vh; margin-left: auto;">
+
         </div>
         <div style="padding: 10px;
-        border-radius: 10px; margin-top: 10vh; background-color: var(--backgroundLight);">
+        border-radius: 10px; margin-top: 10vh; margin-bottom: 10px; margin-left: auto; margin-right: 20px; background-color: var(--backgroundLight); position: relative;">
+            <div id="topBoard" class="board_addon" style="width: 80vh; position: absolute; top: -8vh;">
+                <img id="topFace" src="https://api.dicebear.com/7.x/personas/svg?seed=felix">
+                <p id="topName">Felix</p>
+            </div>
             <div id="battleBoard" style="width: 71vh"></div>
             <div id="bottomBoard" style="width: 69vh;" class="board_addon">
                 <img id="bottomFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow">
-                <p id="bottomName">You <a style="font-size: 1rem; color: var(--backgroundDark);">(120 ELO)</a></p>
-                <button class="resign_button" style="margin-left: auto;" onclick="resign()"><i class="fa-solid fa-flag"></i></button>
+                <p id="bottomName">You</p>
+                <button class="start_button" id="startButton" style="margin-left: auto;" disabled onclick="battleBots()"><i class="fa-solid fa-play" style="margin-right: 5px;"></i>RUN</button>
+                <button class="resign_button" onclick="resign()"><i class="fa-solid fa-flag"></i></button>
             </div>
         </div>
-        <div id="main_info_container" class="main_container" style="margin-left: 20px; margin-top: 20px; position: relative;">
-            <p style="font-size: 2rem; font-family: 'header_main'; color: var(--fontColorBlend); position: absolute; top: 0; left: 50%; transform: translate(-50%, 0);">Rooms</p>
+        <div id="main_info_container" class="main_container" style=" margin-top: 20px; margin-right: auto; position: relative;">
+            <p style="font-size: 2rem; font-family: 'header_main'; color: var(--secondary); position: absolute; top: 0; left: 50%; transform: translate(-50%, 0);">Rooms</p>
             <div id="roomContainer" style="position: relative; display: flex; flex-direction: column; align-items: center; margin: auto; padding-bottom: 50px;
             border-bottom: 2px solid var(--background);
             width: 99%;">
@@ -125,31 +131,31 @@
                 </div>
                 <div id="roomJoin" class="hidden">
                     <button onclick="backRoom()" style="position: absolute; top: 0; left: 0;"><i class="fa-solid fa-left-long"></i></button>
-                    <input placeholder="Enter your code" id="roomRequest">
+                    <input autocomplete="off" placeholder="Enter your code" id="roomRequest">
                     <button onclick="submitCode()">Confirm</button>
                 </div>
             </div>
-            <div id="botContainer" class="bot_selection_container">
+            <div id="battleBotContainer" class="bot_selection_container">
                 <a><p style="margin: 0; margin-right: auto; font-family: 'header_main'; font-size: 1.4rem;">Added Bots</p> </a>
-                <button class="icon_button selected_bot" id='0' onclick="activateBot(0)">
+                <button class="icon_button selected_bot" id='battle0' onclick="activateBot(0)">
                     <img src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow" style="border-radius: 5px; padding: 5px;">
                 </button>
-                <button class="icon_button" id='1' onclick="activateBot(1)">
+                <button class="icon_button" id='battle1' onclick="activateBattleBot(1)">
                     <img src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat" style="border-radius: 5px; padding: 5px;">
                 </button>
-                <button class="icon_button" id='2'onclick="activateBot(2)">
+                <button class="icon_button" id='battle2'onclick="activateBattleBot(2)">
                     <img src="https://api.dicebear.com/7.x/bottts/svg?seed=meditti" style="border-radius: 5px; padding: 5px;">
                 </button>
-                <button class="icon_button" id='3' onclick="activateBot(3)">
+                <button class="icon_button" id='battle3' onclick="activateBattleBot(3)">
                     <img src="https://api.dicebear.com/7.x/bottts/svg?seed=hamza" style="border-radius: 5px; padding: 5px;">
                 </button>
-                <button class="icon_button" id='4' onclick="activateBot(4)">
+                <button class="icon_button" id='battle4' onclick="activateBattleBot(4)">
                     <img src="https://api.dicebear.com/7.x/bottts/svg?seed=pooper" style="border-radius: 5px; padding: 5px;">
                 </button>
-                <button class="icon_button" id='5' onclick="activateBot(5)">
+                <button class="icon_button" id='battle5' onclick="activateBattleBot(5)">
                     <img src="https://api.dicebear.com/7.x/bottts/svg?seed=earss" style="border-radius: 5px; padding: 5px;">
                 </button>
-                <button id="createBotButton" class="create_bot_button" onclick="createBot()" style="background-image: url(https://cdn.pixabay.com/photo/2017/03/19/03/51/material-icon-2155448_1280.png);">
+                <button id="createBattleBotButton" class="create_bot_button" onclick="createBot()" style="background-image: url(https://cdn.pixabay.com/photo/2017/03/19/03/51/material-icon-2155448_1280.png);">
                     <i class="fa-solid fa-plus"></i>
                 </button>
             </div>
@@ -165,7 +171,7 @@
     </div>
     <div id="templatesPopupContainer" class="templates_popup_container hidden">
         <div class="templates_popup">
-            <div class="templates_popup_header"><i class="fa-solid fa-code" style="margin-right: 5px;"></i></div>
+            <div class="templates_popup_header">Templates</div>
             <div id="popupBody" class="templates_popup_body">
                 <button class="template_button">
                     <i class="fa-solid fa-chess-pawn" style="margin-right: 5px;"></i> RANDOM
@@ -185,14 +191,22 @@
             </div>  
         </div>
     </div>
-    <div id="position" class="hidden" style="display: flex; margin-left: 20rem; margin-top: 5vh;">
+    <div id="position" class="hidden" style="display: flex; width: 100vw; align-items: flex-end;">
+        <div style="width: 10vw; height: 100vh; margin-left: auto;">
+
+        </div>
         <div style="padding: 10px;
         border-radius: 10px;">
             <div id="analysisBoard" style="width: 70vh"></div>
         </div>
-        <div class="main_container">
+        <div class="main_container" style="margin-right: auto; position: relative;">
+            <p style="font-size: 2rem; font-family: 'header_main'; color: var(--secondary); position: absolute; top: 0; left: 50%; transform: translate(-50%, 0);">POSITION</p>
+            <div id="roomContainer" style="position: relative; display: flex; flex-direction: column; align-items: center; margin: auto; padding-bottom: 50px;
+            border-bottom: 2px solid var(--background);
+            width: 99%;">
+            </div>
             <div id="fenContainer" class="fen_container" style="margin-top: 0;">
-                <a><p style="margin: 0; margin-right: auto;">FEN</p> <p class="open_docs" onclick="window.open(`https://www.chessprogramming.org/Test-Positions`)" style="margin: 0; margin-left: auto; font-size: 0.8rem; font-weight: 500; display: flex; align-items: flex-end; text-wrap: nowrap; font-size: 1.5rem;"><i class="fa-solid fa-book" style="margin-right: 10px; color: var(--fontColor);"></i></button></p></a>
+                <a><p style="margin: 0; margin-right: auto;">FEN</p> <p class="open_docs" onclick="window.open(`https://www.chessprogramming.org/Test-Positions`)" style="margin: 0; margin-left: auto; font-size: 0.8rem; font-weight: 500; display: flex; align-items: flex-end; text-wrap: nowrap; font-size: 1.5rem;"><i class="fa-solid fa-book" style="margin-right: 10px;"></i></button></p></a>
                 <input id="fen_ele" value="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" onchange="updateFen()" spellcheck="false">
             </div>
             <div id="analysisBotContainer" class="bot_container bot_selection_container" style="margin-top: auto;">

@@ -2,7 +2,7 @@ var currentPopupIndex
 function disableStart(){
     if(selectedBots[0].name !== "You" && selectedBots[1].name !== "You") startButtonEle.disabled = false
     else startButtonEle.disabled = true
-  }
+}
 
 function activateAnalyisisBot(botID){
     var oldClassList = document.getElementById(`analysis${selectedAnalysisBot.id}`).classList
@@ -11,15 +11,15 @@ function activateAnalyisisBot(botID){
     oldClassList.remove('selected_bot')
     newClassList.add('selected_bot')
     selectedAnalysisBot = addedBots[botID]
-  }
-  function activateCustomAnalysisBot(bot){
+}
+function activateCustomAnalysisBot(bot){
     var oldClassList = document.getElementById(`analysis${selectedAnalysisBot.id}`).classList
     var newClassList = document.getElementById(`analysis${bot.id}`).classList
   
     oldClassList.remove('selected_bot')
     newClassList.add('selected_bot')
     selectedAnalysisBot = bot
-  }
+}
 
 function resetAnalysisBoard(){
     analysisBoard = Chessboard('analysisBoard', analysisConfig)
@@ -292,9 +292,9 @@ function switchMode(mode){
 }
 function battleBots(){
     startButtonEle.disabled = true
+    stopGame = false 
     document.getElementById('botContainer').classList.add("no_opacity")
     document.getElementById('main_info_container').classList.add("no_access")
-    side = "w"
-    moveAI()
+    selectedBot = game.turn() == "b" ? 1 : 0
     window.setTimeout(moveCustomBot, 1000)
   }

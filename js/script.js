@@ -18,10 +18,12 @@ var bottomName = document.getElementById("bottomName")
 
 var startButtonEle = document.getElementById("startButton")
 
-var botContainer = document.getElementById('analysisBotContainer')
-var createBotButton = document.getElementById('createAnalysisBotButton')
+var analysisBotContainer = document.getElementById('analysisBotContainer')
+var createAnalysisBotButton = document.getElementById('createAnalysisBotButton')
 var botContainer = document.getElementById('botContainer')
 var createBotButton = document.getElementById('createBotButton')
+var battleBotContainer = document.getElementById("battleBotContainer")
+var createBattleBotButton = document.getElementById("createBattleBotButton")
 
 var stopGame = false
 
@@ -56,6 +58,7 @@ var shuffleScriptCount = 0
 var selectedBots = [addedBots[0],addedBots[1]]
 var selectedBot = 0
 var selectedAnalysisBot = addedBots[1]
+var selectedBattleBot = addedBots[0]
 var lockFirst = true
 var lockSecond = false
 
@@ -122,7 +125,12 @@ async function moveAI () {
 function checkGameOver(){
   if (game.game_over() && !document.getElementById('botContainer').classList.contains("no_access")){
     document.getElementById('face_speechbox').innerHTML = 'Good game!'
-    document.getElementById('restart').disabled = false
+    stopGame = true
+    startButtonEle.disabled = false
+
+    document.getElementById('botContainer').classList.remove("no_opacity")
+    document.getElementById('main_info_container').classList.remove("no_access")
+    startButtonEle.disabled = false
     return
   } else if(game.game_over()){
     resign()
@@ -130,6 +138,7 @@ function checkGameOver(){
 }
 async function moveCustomBot(){
   side = game.turn()
+  console.log(side, selectedBot, selectedBots)
   await moveAI()
 
   if(!stopGame){
@@ -171,7 +180,6 @@ async function onDrop (source, target) {
 }
 async function onSnapEnd () {
   board.position(game.fen())
-  document.getElementById('restart').disabled = true
 }
 var config = {
   draggable: true,
@@ -231,19 +239,6 @@ function saySomething(){
   else face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
 
   robotNameEle.innerHTML = bot.name
-}
-
-function restartGame(){
-  game = new Chess()
-  board.position(game.fen())
-  document.getElementById('restart').disabled = true
-
-
-  if(selectedBots[0].name != "You"){
-     battleBots()
-  } else {
-    selectedBot = 0
-  }
 }
 
 
@@ -387,7 +382,7 @@ analysisBoard = Chessboard('analysisBoard', analysisConfig)
 var analysisGame = new Chess()
 
 function updateAnalysisBoard(){
-  botContainer.removeChild(document.getElementById('createAnalysisBotButton'))
+  analysisBotContainer.removeChild(document.getElementById('createAnalysisBotButton'))
 
   var bot = customBots[customBots.length-1]
   var botHTML = document.createElement('button')
@@ -398,33 +393,31 @@ function updateAnalysisBoard(){
 
   botHTML.classList.add('icon_button')
   botHTML.onclick = function() {
-    activateCustomAnalysisBot(bot)
+    activateCustomAnalysisBot(bot)  
   }
   botHTML.id = `analysis${bot.id}`
 
-  botContainer.appendChild(botHTML)
+  analysisBotContainer.appendChild(botHTML)
 
-  botContainer.appendChild(createBotButton)
+  analysisBotContainer.appendChild(createAnalysisBotButton)
   document.getElementById(`analysis${selectedAnalysisBot.id}`).classList.add("selected_bot")
 }
-function evaluateAnalysisBoard(){
+async function evaluateAnalysisBoard(){
+  var functions = gatherFunctions()
   var optimalMove
-  var bot = selectedAnalysisBot
 
   var temp = game.fen()
   game = new Chess(analysisGame.fen())
 
-  if(bot.uniqueFunctionParams){
-    optimalMove = bot.function(game.moves(), game)
-  } else {
-    optimalMove = bot.function()
-  }
+  await sendToWorker(functions, selectedAnalysisBot.function.name, selectedAnalysisBot.uniqueFunctionParams ? true : false)
+  optimalMove = result
 
   analysisGame.move(optimalMove)
   analysisBoard.position(analysisGame.fen())
   side = analysisGame.turn()
   document.getElementById("fen_ele").value = analysisGame.fen()
   game = new Chess(temp)
+  console.log(temp)
 }
 
 //to create and attatch the script tag
@@ -461,6 +454,7 @@ function createBot(){
   addNewCodeSection(bot)
   botScriptCount++
   updateAnalysisBoard()
+  updateBattleBots()
 }
 function createEval(){
   var scriptID = Math.round((Math.random()+1)*1000)
@@ -507,13 +501,10 @@ function resign(){
   if(document.getElementById('main_info_container').classList.contains("no_access")){
     stopGame = true
     startButtonEle.disabled = false
-    document.getElementById('face_speechbox').innerHTML = 'Good game!'
-    document.getElementById('restart').disabled = false
 
     document.getElementById('botContainer').classList.remove("no_opacity")
     document.getElementById('main_info_container').classList.remove("no_access")
     startButtonEle.disabled = false
-    stopGame = false 
   } else {
     board = Chessboard('board', config)
     game = new Chess()

@@ -20,7 +20,9 @@
       {
         "ignore": [
           "width: fit-content",
-          "backdrop-filter"
+          "backdrop-filter",
+          "width: calc(fit-content - 40px)",
+          "width: calc(fit-content - 25vw)"
         ]
       }
     ],
