@@ -26,9 +26,9 @@
         <div class="side_bar_navigation unselectable" onclick="switchTabs('main')">
             <i class="fa-solid fa-home" style="margin-right: 10px;"></i><a>MAIN</a>
         </div>
-        <!-- <div class="side_bar_navigation unselectable" onclick="switchTabs('battle')">
+        <div class="side_bar_navigation unselectable" onclick="switchTabs('battle')">
             <i class="fa-solid fa-chess" style="margin-right: 10px;"></i><a>MULTIPLAYER</a>
-        </div> -->
+        </div>
         <div class="side_bar_navigation unselectable" onclick="switchTabs('codeContainer')">
             <i class="fa-solid fa-screwdriver-wrench" style="margin-right: 10px;"></i><a>WORKSHOP</a>
         </div>
@@ -45,8 +45,8 @@
             <i class="fa-solid fa-sun" style="margin-right: 10px;"></i><a>LIGHT MODE</a>
         </div>
     </div>
-    <div id="main" style="display: flex; width: 100vw; align-items: flex-end;">
-        <div style="width: 10vw; height: 100vh; margin-left: auto;">
+    <div id="main" class="hidden"  style="display: flex; width: 100vw; align-items: flex-end;">
+        <div class="sidebar_placeholder" style="width: 10vw; height: 100vh; margin-left: auto;">
 
         </div>
         <div style="padding: 10px;
@@ -55,7 +55,7 @@
                 <img id="topFace" src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat">
                 <p id="topName">Potlick</p>
             </div>
-            <div id="board" style="width: 71vh"></div>
+            <div id="board" style="width: 75vh"></div>
             <div id="bottomBoard" style="width: 69vh;" class="board_addon">
                 <img id="bottomFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow">
                 <p id="bottomName">You</p>
@@ -97,7 +97,7 @@
             </div>
         </div>
     </div>
-    <div id="battle" class="hidden" style="display: flex; width: 100vw; align-items: flex-end;">
+    <div id="battle" style="display: flex; width: 100vw; align-items: flex-end;">
         <div style="width: 10vw; height: 100vh; margin-left: auto;">
 
         </div>
@@ -107,7 +107,7 @@
                 <img id="topFace" src="https://api.dicebear.com/7.x/personas/svg?seed=felix">
                 <p id="topName">Felix</p>
             </div>
-            <div id="battleBoard" style="width: 71vh"></div>
+            <div id="battleBoard" style="width: 75vh"></div>
             <div id="bottomBoard" style="width: 69vh;" class="board_addon">
                 <img id="bottomFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow">
                 <p id="bottomName">You</p>
@@ -121,18 +121,18 @@
             border-bottom: 2px solid var(--background);
             width: 99%;">
                 <div id="roomMenu">
-                    <button onclick="createRoom()">Create Room</button>
-                    <button onclick="joinRoom()">Enter Code</button>
+                    <button onclick="createRoom()" id="createRoomButton">Create Room</button>
+                    <button onclick="joinRoom()" id="joinRoomButton">Enter Code</button>
                 </div>
                 <div id="roomCreated" class="hidden">
-                    <button onclick="backRoom()" style="position: absolute; top: 0; left: 0;"><i class="fa-solid fa-left-long"></i></button>
+                    <button onclick="backRoom()" id="exitFromCreatedRoom" style="position: absolute; top: 0; left: 0;"><i class="fa-solid fa-left-long"></i></button>
                     <p id="roomNumber" style="font-family: 'header_main'; font-size: 1.2rem; display: inline;">Code: 1234</p>
-                    <button onclick="submitCode()" disabled>Start</button>
+                    <button id="startBattle" onclick="startBattle()" disabled>Start</button>
                 </div>
                 <div id="roomJoin" class="hidden">
-                    <button onclick="backRoom()" style="position: absolute; top: 0; left: 0;"><i class="fa-solid fa-left-long"></i></button>
+                    <button onclick="backRoom()" id="exitFromJoinedRoom" style="position: absolute; top: 0; left: 0;"><i class="fa-solid fa-left-long"></i></button>
                     <input autocomplete="off" placeholder="Enter your code" id="roomRequest">
-                    <button onclick="submitCode()">Confirm</button>
+                    <button id="submitCode" onclick="submitCode()">Confirm</button>
                 </div>
             </div>
             <div id="battleBotContainer" class="bot_selection_container">
@@ -192,14 +192,14 @@
         </div>
     </div>
     <div id="position" class="hidden" style="display: flex; width: 100vw; align-items: flex-end;">
-        <div style="width: 10vw; height: 100vh; margin-left: auto;">
+        <div class="sidebar_placeholder" style="width: 10vw; height: 100vh; margin-left: auto;">
 
         </div>
         <div style="padding: 10px;
-        border-radius: 10px;">
-            <div id="analysisBoard" style="width: 70vh"></div>
+        border-radius: 10px; margin-right: 5vh;">
+            <div id="analysisBoard" style="width: 70vh; max-height: calc(69vh + 50px + 140px); height: 100vw;"></div>
         </div>
-        <div class="main_container" style="margin-right: auto; position: relative;">
+        <div class="main_container" style="margin-right: auto; position: relative; padding: 0;">
             <p style="font-size: 2rem; font-family: 'header_main'; color: var(--secondary); position: absolute; top: 0; left: 50%; transform: translate(-50%, 0);">POSITION</p>
             <div id="roomContainer" style="position: relative; display: flex; flex-direction: column; align-items: center; margin: auto; padding-bottom: 50px;
             border-bottom: 2px solid var(--background);

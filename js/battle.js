@@ -1,36 +1,48 @@
-var battleBoard = null
+var battleBoard = Chessboard('battleBoard', 'start')
 var battleGame = new Chess()
+
 var moveToSend
+var opponent = {name: "felix", url: "https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat"}
 
 var joinRoomEle = document.getElementById("roomJoin")
 var createdRoomEle = document.getElementById("roomCreated")
 var roomMenu = document.getElementById("roomMenu")
 
-const ws = new WebSocket("ws://localhost:8082")
+const ws = new WebSocket("ws://localhost:8082");
+
+let clientId;
 
 ws.addEventListener("open", () => {
-  console.log("we are connected!")
+    console.log("we are connected!");
 
-  ws.send("Hey hows it going!")
-})
+    ws.send(JSON.stringify({ type: 'move', data: "e3" }))
+});
 
 ws.addEventListener("message", e => {
-  console.log(e)
-})
+    const message = JSON.parse(e.data);
+    console.log("message")
 
-async function generateMove () {
-    var functions = gatherFunctions()
-  
-    await sendToWorker(functions, selectedBots[selectedBot].function.name, selectedBots[selectedBot].uniqueFunctionParams ? true : false)
-    moveToSend = result
-  
-    //move piece, update board, & have bot say dialogue
-    game.move(optimalMove)
-    board.position(game.fen())
-    saySomething()
-    checkGameOver()
-  
-    selectedBot == 0 ? selectedBot = 1 : selectedBot = 0
+    if (message.type === 'client_id') {
+        clientId = message.data;
+        console.log('Received client ID:', clientId);
+    } else if(message.type == 'move') {
+        battleGame.move(message.data)
+        battleBoard.position(battleGame.fen())
+        console.log("gyeetay" + message.data)
+    } else if(message.type == 'alert'){
+        document.getElementById("startBattle").disabled = false
+    }
+});
+
+function disableAllButtons(){
+  document.getElementById("createRoomButton").disabled = true
+  document.getElementById("joinRoomButton").disabled = true
+  document.getElementById("exitFromCreatedRoom").disabled = true
+  document.getElementById("roomNumber").classList.add("disabled") 
+  document.getElementById("startBattle").disabled = true
+  document.getElementById("exitFromJoinedRoom").disabled = true
+  document.getElementById("roomRequest").classList.add("disabled") 
+  document.getElementById("submitCode").disabled = true
 }
 function backRoom(){
     joinRoomEle.classList.add("hidden")
@@ -44,6 +56,33 @@ function joinRoom(){
 function createRoom(){
     createdRoomEle.classList.remove("hidden") 
     roomMenu.classList.add("hidden") 
+
+    var roomCode = Math.round(Math.random()*10000)
+    ws.send(JSON.stringify({ type: "createRoom", data: roomCode }))
+    document.getElementById("roomNumber").innerHTML = roomCode
+}
+function submitCode(){
+  var roomCode = document.getElementById("roomRequest").value
+  console.log(roomCode)
+  ws.send(JSON.stringify({ type: "joinRoom", data: roomCode }))
+}
+async function startBattle(){
+  disableAllButtons()
+
+  await generateMove()
+}
+async function generateMove () {
+  var functions = gatherFunctions()
+
+  await sendToWorker(battleGame.fen(), functions, selectedBattleBot.function.name, selectedBattleBot.uniqueFunctionParams ? true : false)
+  moveToSend = result
+
+  //move piece, update board, & have bot say dialogue
+  battleGame.move(moveToSend)
+  battleBoard.position(battleGame.fen())
+
+
+  ws.send(JSON.stringify({type: "move", data: moveToSend}))
 }
 
 function activateBattleBot(botID){
@@ -83,5 +122,3 @@ function updateBattleBots(){
   battleBotContainer.appendChild(createBotButton)
   document.getElementById(`battle${selectedBattleBot.id}`).classList.add("selected_bot")
 }
-
-battleBoard = Chessboard('battleBoard', 'start')

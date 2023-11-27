@@ -33,14 +33,14 @@ const worker = new Worker('./js/worker.js')
 worker.addEventListener('message', function (e) {
   result = e.data;
 });
-async function sendToWorker(functions, functionToUse, uniqueFunctionParams){
+async function sendToWorker(fen, functions, functionToUse, uniqueFunctionParams){
   return new Promise((resolve) => {
     worker.onmessage = function (event) {
         const result = event.data;
         resolve(result);
     };
 
-    worker.postMessage({functions: functions, fen: game.fen(), functionToUse: functionToUse, uniqueFunctionParams: uniqueFunctionParams});
+    worker.postMessage({functions: functions, fen: fen, functionToUse: functionToUse, uniqueFunctionParams: uniqueFunctionParams});
   });
 }
 
@@ -58,7 +58,7 @@ var shuffleScriptCount = 0
 var selectedBots = [addedBots[0],addedBots[1]]
 var selectedBot = 0
 var selectedAnalysisBot = addedBots[1]
-var selectedBattleBot = addedBots[0]
+var selectedBattleBot = addedBots[1]
 var lockFirst = true
 var lockSecond = false
 
