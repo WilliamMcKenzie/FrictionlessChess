@@ -36,16 +36,32 @@ var roomMenu = document.getElementById("roomMenu")
 
 const ably = new Ably.Realtime('6CRUdA.ipg9IQ:9Md9kAnnJWL2f65gNtkyX1EQaBH0zUEG_ZnlMROWmJ8');
 
-const channel = ably.channels.get('chess-moves');
+//will store whichever channel user is connected too
+var channel
 
-// Publish a move
-channel.publish('move', { from: 'e2', to: 'e4' });
+//to signal resignation and stop game
+var resign = false
+//which player 
+var player = 0
 
-// Subscribe to moves
-channel.subscribe('move', (message) => {
-  // Handle incoming move
-  console.log('Received move:', message.data);
-});
+function addChannelListeners(){
+  channel.subscribe('move', async (message) => {
+    if(message.data.player != player){
+      battleGame.move(message.data.move)
+      battleBoard.position(battleGame.fen())
+
+      if(selectedBattleBot.function)
+      {
+        window.setTimeout(generateMove, 500)
+      } else {
+        enableBoardMovement()
+      }
+    }
+  });
+  channel.subscribe('update', (message) => {
+    document.getElementById("startBattle").disabled = false
+  });
+}
 
 function disableAllButtons(){
   document.getElementById("createRoomButton").disabled = true
@@ -70,21 +86,34 @@ function createRoom(){
     createdRoomEle.classList.remove("hidden") 
     roomMenu.classList.add("hidden") 
 
-    // var roomCode = Math.round(Math.random()*10000)
-    // ws.send(JSON.stringify({ type: "createRoom", data: roomCode }))
-    // document.getElementById("roomNumber").innerHTML = roomCode
+    var roomCode = Math.round(Math.random()*10000)
+    channel = ably.channels.get(roomCode.toString());
+    player = 0
+    addChannelListeners()
+    document.getElementById("roomNumber").innerHTML = roomCode
 }
 function submitCode(){
   var roomCode = document.getElementById("roomRequest").value
-  console.log(roomCode)
-  // ws.send(JSON.stringify({ type: "joinRoom", data: roomCode }))
+  channel = ably.channels.get(roomCode.toString());
+  player = 1
+  addChannelListeners()
+  disableAllButtons()
+  channel.publish('update',  'joined');
+}
+function stopBattle(){
+  resign = true
 }
 async function startBattle(){
   disableAllButtons()
 
-  await generateMove()
+  if(selectedBattleBot.function)
+  {
+    await generateMove()
+  } else {
+    enableBoardMovement()
+  }
 }
-async function generateMove () {
+async function generateMove (){
   var functions = gatherFunctions()
 
   await sendToWorker(battleGame.fen(), functions, selectedBattleBot.function.name, selectedBattleBot.uniqueFunctionParams ? true : false)
@@ -94,8 +123,45 @@ async function generateMove () {
   battleGame.move(moveToSend)
   battleBoard.position(battleGame.fen())
 
+  if(!resign) channel.publish('move',  { player: player, move: moveToSend})
+}
+function enableBoardMovement(){
+  //board logic
+  function onDragStart (source, piece, position, orientation) {
+    // do not pick up pieces if the game is over
+    if (battleGame.game_over()) return false
 
-  // ws.send(JSON.stringify({type: "move", data: moveToSend}))
+    // only pick up pieces for the side to move
+    if ((battleGame.turn() === 'w' && piece.search(/^b/) !== -1) ||
+        (battleGame.turn() === 'b' && piece.search(/^w/) !== -1) ||
+        (battleGame.turn() === 'w' && player == 1) ||
+        (battleGame.turn() === 'b' && player == 0)) {
+      return false
+    }
+  }
+  async function onDrop (source, target) {
+    // see if the move is legal
+    var move = battleGame.move({
+      from: source,
+      to: target,
+      promotion: 'q' // NOTE: always promote to a queen for example simplicity
+    })
+
+    // illegal move
+    if (move === null) return 'snapback'
+    channel.publish('move',  { player: player, move: move})
+  }
+  async function onSnapEnd () {
+    battleBoard.position(battleGame.fen())
+  }
+  var config = {
+    draggable: true,
+    position: battleGame.fen(),
+    onDragStart: onDragStart,
+    onDrop: onDrop,
+    onSnapEnd: onSnapEnd
+  }
+  battleBoard = Chessboard('battleBoard', config)
 }
 
 function activateBattleBot(botID){
@@ -113,6 +179,7 @@ function activateCustomBattleBot(bot){
   oldClassList.remove('selected_bot')
   newClassList.add('selected_bot')
   selectedBattleBot = bot
+  console.log(bot)
 }
 function updateBattleBots(){
   var createBotButton = document.getElementById("createBattleBotButton")

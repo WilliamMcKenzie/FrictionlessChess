@@ -58,7 +58,7 @@ var shuffleScriptCount = 0
 var selectedBots = [addedBots[0],addedBots[1]]
 var selectedBot = 0
 var selectedAnalysisBot = addedBots[1]
-var selectedBattleBot = addedBots[1]
+var selectedBattleBot = addedBots[0]
 var lockFirst = true
 var lockSecond = false
 

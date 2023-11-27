@@ -16,6 +16,10 @@
     filter: opacity(0.5);
     cursor: not-allowed;
 }
+.disabled {
+    filter: opacity(0.5);
+    cursor: not-allowed;
+}
 #roomNumber {
     border: 0;
     border-bottom: 5px solid var(--secondaryDark);

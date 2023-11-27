@@ -108,11 +108,10 @@
                 <p id="topName">Felix</p>
             </div>
             <div id="battleBoard" style="width: 75vh"></div>
-            <div id="bottomBoard" style="width: 69vh;" class="board_addon">
+            <div id="bottomBoard" style="width: 74vh;" class="board_addon">
                 <img id="bottomFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow">
                 <p id="bottomName">You</p>
-                <button class="start_button" id="startButton" style="margin-left: auto;" disabled onclick="battleBots()"><i class="fa-solid fa-play" style="margin-right: 5px;"></i>RUN</button>
-                <button class="resign_button" onclick="resign()"><i class="fa-solid fa-flag"></i></button>
+                <button style="margin-left: auto;" class="resign_button" onclick="stopBattle()"><i class="fa-solid fa-flag"></i></button>
             </div>
         </div>
         <div id="main_info_container" class="main_container" style=" margin-top: 20px; margin-right: auto; position: relative;">
@@ -137,7 +136,7 @@
             </div>
             <div id="battleBotContainer" class="bot_selection_container">
                 <a><p style="margin: 0; margin-right: auto; font-family: 'header_main'; font-size: 1.4rem;">Added Bots</p> </a>
-                <button class="icon_button selected_bot" id='battle0' onclick="activateBot(0)">
+                <button class="icon_button selected_bot" id='battle0' onclick="activateBattleBot(0)">
                     <img src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow" style="border-radius: 5px; padding: 5px;">
                 </button>
                 <button class="icon_button" id='battle1' onclick="activateBattleBot(1)">
