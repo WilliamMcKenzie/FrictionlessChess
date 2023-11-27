@@ -1,0 +1,14 @@
+{
+    "version": 2,
+    "routes": [
+      {
+        "src": "/(.*)",
+        "headers": {
+          "Access-Control-Allow-Origin": "*",
+          "Connection": "Upgrade",
+          "Upgrade": "websocket"
+        },
+        "dest": "/index.html"
+      }
+    ]
+  }

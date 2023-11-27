@@ -8,30 +8,43 @@ var joinRoomEle = document.getElementById("roomJoin")
 var createdRoomEle = document.getElementById("roomCreated")
 var roomMenu = document.getElementById("roomMenu")
 
-const ws = new WebSocket("ws://localhost:8082");
+// const ws = new WebSocket("ws://localhost:8082");
 
-let clientId;
+// let clientId;
 
-ws.addEventListener("open", () => {
-    console.log("we are connected!");
+// ws.addEventListener("open", () => {
+//     console.log("we are connected!");
 
-    ws.send(JSON.stringify({ type: 'move', data: "e3" }))
-});
+//     ws.send(JSON.stringify({ type: 'move', data: "e3" }))
+// });
 
-ws.addEventListener("message", e => {
-    const message = JSON.parse(e.data);
-    console.log("message")
+// ws.addEventListener("message", e => {
+//     const message = JSON.parse(e.data);
+//     console.log("message")
 
-    if (message.type === 'client_id') {
-        clientId = message.data;
-        console.log('Received client ID:', clientId);
-    } else if(message.type == 'move') {
-        battleGame.move(message.data)
-        battleBoard.position(battleGame.fen())
-        console.log("gyeetay" + message.data)
-    } else if(message.type == 'alert'){
-        document.getElementById("startBattle").disabled = false
-    }
+//     if (message.type === 'client_id') {
+//         clientId = message.data;
+//         console.log('Received client ID:', clientId);
+//     } else if(message.type == 'move') {
+//         battleGame.move(message.data)
+//         battleBoard.position(battleGame.fen())
+//         console.log("gyeetay" + message.data)
+//     } else if(message.type == 'alert'){
+//         document.getElementById("startBattle").disabled = false
+//     }
+// });
+
+const ably = new Ably.Realtime('6CRUdA.ipg9IQ:9Md9kAnnJWL2f65gNtkyX1EQaBH0zUEG_ZnlMROWmJ8');
+
+const channel = ably.channels.get('chess-moves');
+
+// Publish a move
+channel.publish('move', { from: 'e2', to: 'e4' });
+
+// Subscribe to moves
+channel.subscribe('move', (message) => {
+  // Handle incoming move
+  console.log('Received move:', message.data);
 });
 
 function disableAllButtons(){
@@ -57,14 +70,14 @@ function createRoom(){
     createdRoomEle.classList.remove("hidden") 
     roomMenu.classList.add("hidden") 
 
-    var roomCode = Math.round(Math.random()*10000)
-    ws.send(JSON.stringify({ type: "createRoom", data: roomCode }))
-    document.getElementById("roomNumber").innerHTML = roomCode
+    // var roomCode = Math.round(Math.random()*10000)
+    // ws.send(JSON.stringify({ type: "createRoom", data: roomCode }))
+    // document.getElementById("roomNumber").innerHTML = roomCode
 }
 function submitCode(){
   var roomCode = document.getElementById("roomRequest").value
   console.log(roomCode)
-  ws.send(JSON.stringify({ type: "joinRoom", data: roomCode }))
+  // ws.send(JSON.stringify({ type: "joinRoom", data: roomCode }))
 }
 async function startBattle(){
   disableAllButtons()
@@ -82,7 +95,7 @@ async function generateMove () {
   battleBoard.position(battleGame.fen())
 
 
-  ws.send(JSON.stringify({type: "move", data: moveToSend}))
+  // ws.send(JSON.stringify({type: "move", data: moveToSend}))
 }
 
 function activateBattleBot(botID){
