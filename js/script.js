@@ -34,13 +34,14 @@ worker.addEventListener('message', function (e) {
   result = e.data;
 });
 async function sendToWorker(fen, functions, functionToUse, uniqueFunctionParams){
+  var curGame = new Chess(fen)
   return new Promise((resolve) => {
     worker.onmessage = function (event) {
         const result = event.data;
         resolve(result);
     };
 
-    worker.postMessage({functions: functions, fen: fen, functionToUse: functionToUse, uniqueFunctionParams: uniqueFunctionParams});
+    worker.postMessage({functions: functions, fen: fen, functionToUse: functionToUse, uniqueFunctionParams: uniqueFunctionParams, side: curGame.turn()});
   });
 }
 
@@ -109,7 +110,7 @@ function gatherFunctions(){
 async function moveAI () {
   var functions = gatherFunctions()
 
-  await sendToWorker(functions, selectedBots[selectedBot].function.name, selectedBots[selectedBot].uniqueFunctionParams ? true : false)
+  await sendToWorker(game.fen(), functions, selectedBots[selectedBot].function.name, selectedBots[selectedBot].uniqueFunctionParams ? true : false)
   optimalMove = result
 
   //move piece, update board, & have bot say dialogue
@@ -406,18 +407,13 @@ async function evaluateAnalysisBoard(){
   var functions = gatherFunctions()
   var optimalMove
 
-  var temp = game.fen()
-  game = new Chess(analysisGame.fen())
-
-  await sendToWorker(functions, selectedAnalysisBot.function.name, selectedAnalysisBot.uniqueFunctionParams ? true : false)
+  await sendToWorker(analysisGame.fen(), functions, selectedAnalysisBot.function.name, selectedAnalysisBot.uniqueFunctionParams ? true : false)
   optimalMove = result
 
   analysisGame.move(optimalMove)
   analysisBoard.position(analysisGame.fen())
   side = analysisGame.turn()
   document.getElementById("fen_ele").value = analysisGame.fen()
-  game = new Chess(temp)
-  console.log(temp)
 }
 
 //to create and attatch the script tag
@@ -495,18 +491,4 @@ function createMisc(){
   addNewMiscSection(scriptID)
 
   return scriptID
-}
-
-function resign(){
-  if(document.getElementById('main_info_container').classList.contains("no_access")){
-    stopGame = true
-    startButtonEle.disabled = false
-
-    document.getElementById('botContainer').classList.remove("no_opacity")
-    document.getElementById('main_info_container').classList.remove("no_access")
-    startButtonEle.disabled = false
-  } else {
-    board = Chessboard('board', config)
-    game = new Chess()
-  }
 }

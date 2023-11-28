@@ -6,6 +6,7 @@ self.addEventListener('message', function (e) {
     const functions = data.functions
     const functionToUse = data.functionToUse
     const uniqueFunctionParams = data.uniqueFunctionParams
+    const side = data.side
 
     const pieceVal = { 'p': 100, 'n': 280, 'b': 320, 'r': 479, 'q': 929, 'k': 60000, 'P' : -100, 'N' : -280, 'B' : -320, 'R' : -479, 'Q' : -929, 'K' : -60000}
     var positionMap = {

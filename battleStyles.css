@@ -19,6 +19,7 @@
 .disabled {
     filter: opacity(0.5);
     cursor: not-allowed;
+    pointer-events: none
 }
 #roomNumber {
     border: 0;
@@ -45,4 +46,8 @@
 }
 #roomRequest::placeholder {
     color: var(--secondaryLight);
+}
+#roomCreated {
+    display: flex;
+    flex-direction: column;
 }

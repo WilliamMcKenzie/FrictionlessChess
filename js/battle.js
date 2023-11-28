@@ -38,6 +38,7 @@ const ably = new Ably.Realtime('6CRUdA.ipg9IQ:9Md9kAnnJWL2f65gNtkyX1EQaBH0zUEG_Z
 
 //will store whichever channel user is connected too
 var channel
+let channelOpts = { params: { occupancy: 'metrics' } };
 
 //to signal resignation and stop game
 var resign = false
@@ -49,27 +50,32 @@ function addChannelListeners(){
     if(message.data.player != player){
       battleGame.move(message.data.move)
       battleBoard.position(battleGame.fen())
-
       if(selectedBattleBot.function)
       {
         window.setTimeout(generateMove, 500)
       } else {
-        enableBoardMovement()
+        window.setTimeout(enableBoardMovement, 500)
       }
     }
   });
-  channel.subscribe('update', (message) => {
-    document.getElementById("startBattle").disabled = false
+  channel.subscribe('join', (message) => {
+    if(message.data.player != player){
+      document.getElementById("enemyFace").src = `https://api.dicebear.com/7.x/personas/svg?seed=${message.data.name}`
+      document.getElementById("enemyName").innerHTML = message.data.name
+      document.getElementById("startBattle").disabled = false
+    }
+  });
+  channel.subscribe('leave', (message) => {
+    document.getElementById("enemyFace").src = `./img/blacked_out_player.svg`
+    document.getElementById("enemyName").innerHTML = message.data.name
   });
 }
 
 function disableAllButtons(){
   document.getElementById("createRoomButton").disabled = true
   document.getElementById("joinRoomButton").disabled = true
-  document.getElementById("exitFromCreatedRoom").disabled = true
   document.getElementById("roomNumber").classList.add("disabled") 
   document.getElementById("startBattle").disabled = true
-  document.getElementById("exitFromJoinedRoom").disabled = true
   document.getElementById("roomRequest").classList.add("disabled") 
   document.getElementById("submitCode").disabled = true
 }
@@ -77,6 +83,9 @@ function backRoom(){
     joinRoomEle.classList.add("hidden")
     createdRoomEle.classList.add("hidden")  
     roomMenu.classList.remove("hidden") 
+
+    channel.publish('leave', { name: "corbin", player: player});
+    channel.detach()
 }
 function joinRoom(){
     joinRoomEle.classList.remove("hidden") 
@@ -86,25 +95,48 @@ function createRoom(){
     createdRoomEle.classList.remove("hidden") 
     roomMenu.classList.add("hidden") 
 
-    var roomCode = Math.round(Math.random()*10000)
+    var roomCode = codewords[Math.round(Math.random()*codewords.length)] 
+    
     channel = ably.channels.get(roomCode.toString());
     player = 0
     addChannelListeners()
-    document.getElementById("roomNumber").innerHTML = roomCode
+    channel.publish('join', { name: "corbin", player: player});
+    document.getElementById("roomNumber").innerHTML = `Code: ${roomCode}`
 }
 function submitCode(){
   var roomCode = document.getElementById("roomRequest").value
-  channel = ably.channels.get(roomCode.toString());
-  player = 1
-  addChannelListeners()
-  disableAllButtons()
-  channel.publish('update',  'joined');
+
+  var occupancy
+  channel = ably.channels.get(roomCode.toString(), channelOpts);
+  channel.subscribe('[meta]occupancy', (message) => {
+    occupancy = message.data.metrics.connections
+
+    if(occupancy == 1 || occupancy > 2){
+      window.alert("Room not found")
+      channel.detach()
+    } else {
+      player = 1
+      addChannelListeners()
+      disableAllButtons()
+      enableBoardMovement() 
+      channel.publish('join', { name: "max", player: player});
+
+      //go to room section
+      joinRoomEle.classList.add("hidden")
+      createdRoomEle.classList.remove("hidden")  
+      roomMenu.classList.add("hidden") 
+      document.getElementById("roomNumber").innerHTML = `Code: ${roomCode}`
+      document.getElementById("exitFromCreatedRoom").disabled = false
+      document.getElementById("startBattle").classList.add("disabled")
+    }
+  });
 }
 function stopBattle(){
   resign = true
 }
 async function startBattle(){
   disableAllButtons()
+  window.alert("Its your move.")
 
   if(selectedBattleBot.function)
   {
@@ -157,6 +189,7 @@ function enableBoardMovement(){
   var config = {
     draggable: true,
     position: battleGame.fen(),
+    orientation: player == 0 ? "white" : "black",
     onDragStart: onDragStart,
     onDrop: onDrop,
     onSnapEnd: onSnapEnd

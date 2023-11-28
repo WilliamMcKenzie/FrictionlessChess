@@ -104,13 +104,13 @@
         <div style="padding: 10px;
         border-radius: 10px; margin-top: 10vh; margin-bottom: 10px; margin-left: auto; margin-right: 20px; background-color: var(--backgroundLight); position: relative;">
             <div id="topBoard" class="board_addon" style="width: 80vh; position: absolute; top: -8vh;">
-                <img id="topFace" src="https://api.dicebear.com/7.x/personas/svg?seed=felix">
-                <p id="topName">Felix</p>
+                <img id="enemyFace" src="./img/blacked_out_player.svg">
+                <p id="enemyName">Player 2</p>
             </div>
             <div id="battleBoard" style="width: 75vh"></div>
             <div id="bottomBoard" style="width: 74vh;" class="board_addon">
-                <img id="bottomFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow">
-                <p id="bottomName">You</p>
+                <img id="playerFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow">
+                <p id="playerName">You</p>
                 <button style="margin-left: auto;" class="resign_button" onclick="stopBattle()"><i class="fa-solid fa-flag"></i></button>
             </div>
         </div>
@@ -124,9 +124,16 @@
                     <button onclick="joinRoom()" id="joinRoomButton">Enter Code</button>
                 </div>
                 <div id="roomCreated" class="hidden">
-                    <button onclick="backRoom()" id="exitFromCreatedRoom" style="position: absolute; top: 0; left: 0;"><i class="fa-solid fa-left-long"></i></button>
-                    <p id="roomNumber" style="font-family: 'header_main'; font-size: 1.2rem; display: inline;">Code: 1234</p>
-                    <button id="startBattle" onclick="startBattle()" disabled>Start</button>
+                    <div>
+                        <button onclick="backRoom()" id="exitFromCreatedRoom" style="position: absolute; top: 0; left: 0;"><i class="fa-solid fa-left-long"></i></button>
+                        <p id="roomNumber" style="font-family: 'header_main'; font-size: 1.2rem; display: inline;">Code: 1234</p>
+                        <button id="startBattle" onclick="startBattle()" disabled>Start</button>
+                    </div>
+                    <!-- <div id="membersList">
+                        <div class="member" id="0">
+                            <p id="playerName">You</p> <img id="playerFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow">
+                        </div>
+                    </div> -->
                 </div>
                 <div id="roomJoin" class="hidden">
                     <button onclick="backRoom()" id="exitFromJoinedRoom" style="position: absolute; top: 0; left: 0;"><i class="fa-solid fa-left-long"></i></button>
