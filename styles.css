@@ -791,6 +791,13 @@ input[type="checkbox"]:checked::before {
     .bot_selection_container {
         grid-template-columns: auto auto auto;
     }
+
+    #roomCreated button {
+        font-size: 0.8rem !important;
+    }
+    #roomCreated p {
+        font-size: 0.8rem !important;
+    }
 }
 
 @media screen and (max-width: 1200px) {

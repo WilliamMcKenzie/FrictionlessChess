@@ -67,7 +67,8 @@ function addChannelListeners(){
   });
   channel.subscribe('leave', (message) => {
     document.getElementById("enemyFace").src = `./img/blacked_out_player.svg`
-    document.getElementById("enemyName").innerHTML = message.data.name
+    document.getElementById("enemyName").innerHTML = "Player 2"
+    document.getElementById("startBattle").disabled = true
   });
 }
 
@@ -79,10 +80,20 @@ function disableAllButtons(){
   document.getElementById("roomRequest").classList.add("disabled") 
   document.getElementById("submitCode").disabled = true
 }
+function enableAllButtons(){
+  document.getElementById("createRoomButton").disabled = false
+  document.getElementById("joinRoomButton").disabled = false
+  document.getElementById("roomNumber").classList.remove("disabled") 
+  document.getElementById("startBattle").disabled = false
+  document.getElementById("roomRequest").classList.remove("disabled") 
+  document.getElementById("submitCode").disabled = false
+}
 function backRoom(){
     joinRoomEle.classList.add("hidden")
     createdRoomEle.classList.add("hidden")  
     roomMenu.classList.remove("hidden") 
+
+    enableAllButtons()
 
     channel.publish('leave', { name: "corbin", player: player});
     channel.detach()
@@ -133,6 +144,9 @@ function submitCode(){
 }
 function stopBattle(){
   resign = true
+  battleGame = new Chess()
+  battleBoard.position(battleGame.fen())
+  winBattle()
 }
 async function startBattle(){
   disableAllButtons()
@@ -144,6 +158,38 @@ async function startBattle(){
   } else {
     enableBoardMovement()
   }
+}
+function winBattle(){
+  document.getElementById("battleBoard").innerHTML += `<div id="battleBoardFilter" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; display: flex; flex-direction: column; align-items: center;">
+  <div style="margin-top: auto;">
+  <lord-icon
+    src="https://cdn.lordicon.com/xjronrda.json"
+    trigger="in"
+    delay="500"
+    state="in-dynamic"
+    style="width:15vh;height:15vh;">
+  </lord-icon>
+  <lord-icon
+    src="https://cdn.lordicon.com/xjronrda.json"
+    trigger="in"
+    delay="1000"
+    state="in-dynamic"
+    style="width:20vh;height:20vh;">
+  </lord-icon>
+  <lord-icon
+    src="https://cdn.lordicon.com/xjronrda.json"
+    trigger="in"
+    delay="1500"
+    state="in-dynamic"
+    style="width:15vh;height:15vh;">
+  </lord-icon>
+  </div>
+  <div style='font-family: "header_main"; font-size: 3rem'>Game over!</div>
+  <div style="margin-bottom: auto; margin-top: 40px">
+    <button class="restart" onclick="restartBattle()">Restart</button>
+    <button class="restart" onclick="exitRoom()">Done</button>
+  </div>
+</div>`
 }
 async function generateMove (){
   var functions = gatherFunctions()
@@ -195,6 +241,13 @@ function enableBoardMovement(){
     onSnapEnd: onSnapEnd
   }
   battleBoard = Chessboard('battleBoard', config)
+}
+function restartBattle(){
+  channel.publish('restart',  "restart")
+  battleGame = new Chess()
+  battleBoard.position(battleGame.fen())
+
+  document.getElementById("battleBoard").remove(document.getElementById("battleBoardFilter"))
 }
 
 function activateBattleBot(botID){
