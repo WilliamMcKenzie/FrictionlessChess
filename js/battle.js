@@ -2,7 +2,8 @@ var battleBoard = Chessboard('battleBoard', 'start')
 var battleGame = new Chess()
 
 var moveToSend
-var opponent = {name: "felix", url: "https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat"}
+var player0 = {name: "felix0", url: "https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat"}
+var player1 = {name: "felix1", url: "https://api.dicebear.com/7.x/bottts/svg?seed=pooper"}
 
 var joinRoomEle = document.getElementById("roomJoin")
 var createdRoomEle = document.getElementById("roomCreated")
@@ -42,6 +43,8 @@ let channelOpts = { params: { occupancy: 'metrics' } };
 
 //to signal resignation and stop game
 var resign = false
+//if both players accept rematch
+var rematch = false
 //which player 
 var player = 0
 
@@ -59,10 +62,14 @@ function addChannelListeners(){
     }
   });
   channel.subscribe('join', (message) => {
-    if(message.data.player != player){
-      document.getElementById("enemyFace").src = `https://api.dicebear.com/7.x/personas/svg?seed=${message.data.name}`
-      document.getElementById("enemyName").innerHTML = message.data.name
+    if(player == 0){
+      document.getElementById("enemyFace").src = player1.url
+      document.getElementById("enemyName").innerHTML = player1.name
       document.getElementById("startBattle").disabled = false
+    }
+    if(player == 1){
+      document.getElementById("enemyFace").src = player0.url
+      document.getElementById("enemyName").innerHTML = player0.name
     }
   });
   channel.subscribe('leave', (message) => {
@@ -70,6 +77,39 @@ function addChannelListeners(){
     document.getElementById("enemyName").innerHTML = "Player 2"
     document.getElementById("startBattle").disabled = true
   });
+  channel.subscribe('startGame', (message) => {
+    document.getElementById("resignButton").disabled = false
+  });
+  channel.subscribe('gameOver', (message) => {
+    resign = true
+    if(document.getElementById("battleBoardFilter")) document.getElementById("battleBoard").removeChild(document.getElementById("battleBoardFilter"))
+    if(message.data == player.toString()){
+      loseBattle()
+    } 
+    else winBattle()
+  });
+  channel.subscribe('restart', (message) => {
+    
+    if(rematch == true && player.toString() == message.data){
+      channel.publish('rematchAccepted', player.toString())
+    } 
+
+    if(player.toString() != message.data) {
+      console.log(player.toString(), message.data)
+      rematch = true
+    } else {
+      rematch = false
+    }
+
+    document.getElementById("battleRematch").innerHTML = 'Rematch (1/2)'
+  });
+  channel.subscribe('rematchAccepted', (message) => {
+    battleGame = new Chess()
+    battleBoard.position(battleGame.fen())
+
+    document.getElementById("battleBoard").removeChild(document.getElementById("battleBoardFilter"))
+    if(player == 0) startBattle()
+  })
 }
 
 function disableAllButtons(){
@@ -89,13 +129,16 @@ function enableAllButtons(){
   document.getElementById("submitCode").disabled = false
 }
 function backRoom(){
+    enableAllButtons()
+    battleGame = new Chess()
+    battleBoard.position(battleGame.fen())
     joinRoomEle.classList.add("hidden")
     createdRoomEle.classList.add("hidden")  
     roomMenu.classList.remove("hidden") 
+    if(document.getElementById("battleBoardFilter")) document.getElementById("battleBoard").removeChild(document.getElementById("battleBoardFilter"))
 
-    enableAllButtons()
-
-    channel.publish('leave', { name: "corbin", player: player});
+    channel.publish('gameOver', player.toString());
+    channel.publish('leave', player.toString());
     channel.detach()
 }
 function joinRoom(){
@@ -111,7 +154,6 @@ function createRoom(){
     channel = ably.channels.get(roomCode.toString());
     player = 0
     addChannelListeners()
-    channel.publish('join', { name: "corbin", player: player});
     document.getElementById("roomNumber").innerHTML = `Code: ${roomCode}`
 }
 function submitCode(){
@@ -130,7 +172,7 @@ function submitCode(){
       addChannelListeners()
       disableAllButtons()
       enableBoardMovement() 
-      channel.publish('join', { name: "max", player: player});
+      channel.publish('join', player.toString());
 
       //go to room section
       joinRoomEle.classList.add("hidden")
@@ -143,14 +185,11 @@ function submitCode(){
   });
 }
 function stopBattle(){
-  resign = true
-  battleGame = new Chess()
-  battleBoard.position(battleGame.fen())
-  winBattle()
+  channel.publish('gameOver',  player.toString())
 }
 async function startBattle(){
+  channel.publish('startGame',  player.toString())
   disableAllButtons()
-  window.alert("Its your move.")
 
   if(selectedBattleBot.function)
   {
@@ -160,36 +199,10 @@ async function startBattle(){
   }
 }
 function winBattle(){
-  document.getElementById("battleBoard").innerHTML += `<div id="battleBoardFilter" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; display: flex; flex-direction: column; align-items: center;">
-  <div style="margin-top: auto;">
-  <lord-icon
-    src="https://cdn.lordicon.com/xjronrda.json"
-    trigger="in"
-    delay="500"
-    state="in-dynamic"
-    style="width:15vh;height:15vh;">
-  </lord-icon>
-  <lord-icon
-    src="https://cdn.lordicon.com/xjronrda.json"
-    trigger="in"
-    delay="1000"
-    state="in-dynamic"
-    style="width:20vh;height:20vh;">
-  </lord-icon>
-  <lord-icon
-    src="https://cdn.lordicon.com/xjronrda.json"
-    trigger="in"
-    delay="1500"
-    state="in-dynamic"
-    style="width:15vh;height:15vh;">
-  </lord-icon>
-  </div>
-  <div style='font-family: "header_main"; font-size: 3rem'>Game over!</div>
-  <div style="margin-bottom: auto; margin-top: 40px">
-    <button class="restart" onclick="restartBattle()">Restart</button>
-    <button class="restart" onclick="exitRoom()">Done</button>
-  </div>
-</div>`
+  document.getElementById("battleBoard").innerHTML += winBattleHTML
+}
+function loseBattle(){
+  document.getElementById("battleBoard").innerHTML += loseBattleHTML
 }
 async function generateMove (){
   var functions = gatherFunctions()
@@ -201,7 +214,26 @@ async function generateMove (){
   battleGame.move(moveToSend)
   battleBoard.position(battleGame.fen())
 
+  if(battleGame.game_over()){
+    channel.publish("gameOver",  player == 0 ? "1" : "0")
+    return
+  }
+
   if(!resign) channel.publish('move',  { player: player, move: moveToSend})
+}
+function checkBattleGameOver(){
+  if (battleGame.game_over() && !document.getElementById('botContainer').classList.contains("no_access")){
+    document.getElementById('face_speechbox').innerHTML = 'Good game!'
+    stopGame = true
+    startButtonEle.disabled = false
+
+    document.getElementById('botContainer').classList.remove("no_opacity")
+    document.getElementById('main_info_container').classList.remove("no_access")
+    startButtonEle.disabled = false
+    return
+  } else if(game.game_over()){
+    resign()
+  }
 }
 function enableBoardMovement(){
   //board logic
@@ -243,11 +275,7 @@ function enableBoardMovement(){
   battleBoard = Chessboard('battleBoard', config)
 }
 function restartBattle(){
-  channel.publish('restart',  "restart")
-  battleGame = new Chess()
-  battleBoard.position(battleGame.fen())
-
-  document.getElementById("battleBoard").remove(document.getElementById("battleBoardFilter"))
+  channel.publish('restart',  player.toString())
 }
 
 function activateBattleBot(botID){

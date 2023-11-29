@@ -798,6 +798,13 @@ input[type="checkbox"]:checked::before {
     #roomCreated p {
         font-size: 0.8rem !important;
     }
+
+    #roomJoin button {
+        font-size: 0.8rem !important;
+    }
+    #roomJoin input {
+        font-size: 0.8rem !important;
+    }
 }
 
 @media screen and (max-width: 1200px) {

@@ -470,3 +470,53 @@ var botTemplates = [
       'sunset-maze',
       'labyrinth-symphony',
     ];
+
+    var winBattleHTML = `<div id="battleBoardFilter" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; display: flex; flex-direction: column; align-items: center;">
+    <div style="margin-top: auto;">
+    <lord-icon
+      src="https://cdn.lordicon.com/xjronrda.json"
+      trigger="in"
+      delay="500"
+      state="in-dynamic"
+      style="width:15vh;height:15vh;">
+    </lord-icon>
+    <lord-icon
+      src="https://cdn.lordicon.com/xjronrda.json"
+      trigger="in"
+      delay="1000"
+      state="in-dynamic"
+      style="width:20vh;height:20vh;">
+    </lord-icon>
+    <lord-icon
+      src="https://cdn.lordicon.com/xjronrda.json"
+      trigger="in"
+      delay="1500"
+      state="in-dynamic"
+      style="width:15vh;height:15vh;">
+    </lord-icon>
+    </div>
+    <div style='font-family: "header_main"; font-size: 3rem'>Game over!</div>
+    <div style="margin-bottom: 40px;
+    margin-top: auto;">
+      <button id="battleRematch" class="restart" onclick="restartBattle()">Rematch (0/2)</button>
+      <button class="restart" onclick="backRoom()">Done</button>
+    </div>
+  </div>`
+
+  var loseBattleHTML = `<div id="battleBoardFilter" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; display: flex; flex-direction: column; align-items: center;">
+    <div style="margin-top: auto;">
+      <div style='font-family: "header_main"; font-size: 3rem'>Game over!</div>
+    </div>
+    <lord-icon
+        src="https://cdn.lordicon.com/wsfalxed.json"
+        trigger="in"
+        state="in-reveal"
+        colors="primary:#4030e8,secondary:#f9c9c0"
+        style="width:250px;height:250px">
+      </lord-icon>
+    <div style="margin-bottom: 40px;
+    margin-top: auto;">
+      <button id="battleRematch" class="restart" onclick="restartBattle()">Rematch (0/2)</button>
+      <button class="restart" onclick="backRoom()">Done</button>
+    </div>
+  </div>`
