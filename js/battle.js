@@ -2,38 +2,21 @@ var battleBoard = Chessboard('battleBoard', 'start')
 var battleGame = new Chess()
 
 var moveToSend
+
+var username = ""
+
+function submitUsername(){
+  username = document.getElementById("username").value
+  document.getElementById("registerContainer").classList.add("hidden")
+  document.getElementById("roomContainer").classList.remove("hidden")
+}
+
 var player0 = {name: "felix0", url: "https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat"}
 var player1 = {name: "felix1", url: "https://api.dicebear.com/7.x/bottts/svg?seed=pooper"}
 
 var joinRoomEle = document.getElementById("roomJoin")
 var createdRoomEle = document.getElementById("roomCreated")
 var roomMenu = document.getElementById("roomMenu")
-
-// const ws = new WebSocket("ws://localhost:8082");
-
-// let clientId;
-
-// ws.addEventListener("open", () => {
-//     console.log("we are connected!");
-
-//     ws.send(JSON.stringify({ type: 'move', data: "e3" }))
-// });
-
-// ws.addEventListener("message", e => {
-//     const message = JSON.parse(e.data);
-//     console.log("message")
-
-//     if (message.type === 'client_id') {
-//         clientId = message.data;
-//         console.log('Received client ID:', clientId);
-//     } else if(message.type == 'move') {
-//         battleGame.move(message.data)
-//         battleBoard.position(battleGame.fen())
-//         console.log("gyeetay" + message.data)
-//     } else if(message.type == 'alert'){
-//         document.getElementById("startBattle").disabled = false
-//     }
-// });
 
 const ably = new Ably.Realtime('6CRUdA.ipg9IQ:9Md9kAnnJWL2f65gNtkyX1EQaBH0zUEG_ZnlMROWmJ8');
 
@@ -50,9 +33,15 @@ var player = 0
 
 function addChannelListeners(){
   channel.subscribe('move', async (message) => {
+    console.log(message.data.move)
     if(message.data.player != player){
       battleGame.move(message.data.move)
       battleBoard.position(battleGame.fen())
+
+      if(battleGame.in_checkmate() == true){
+        channel.publish("gameOver",  player == 1 ? "1" : "0")
+      }
+
       if(selectedBattleBot.function)
       {
         window.setTimeout(generateMove, 500)
@@ -61,17 +50,38 @@ function addChannelListeners(){
       }
     }
   });
-  channel.subscribe('join', (message) => {
-    if(player == 0){
+  channel.subcribe('updatePlayerCards', (message) => {
+    if(message.data.player == 0 && player == 1)
+    {
+      player0 = {name: message.data.name, url: `https://api.dicebear.com/7.x/bottts/svg?seed=${message.data.icon}`}
+      document.getElementById("enemyFace").src = player0.url
+      document.getElementById("enemyName").innerHTML = player0.name
+    } 
+    else if(message.data.player == 1 && player == 0)
+    {
+      player1 = {name: message.data, url: `https://api.dicebear.com/7.x/bottts/svg?seed=${message.data}`}
       document.getElementById("enemyFace").src = player1.url
       document.getElementById("enemyName").innerHTML = player1.name
       document.getElementById("startBattle").disabled = false
     }
+  })
+  channel.subscribe('join', (message) => {
+    if(player == 0){
+      player1 = {name: message.data, url: `https://api.dicebear.com/7.x/bottts/svg?seed=${message.data}`}
+      document.getElementById("enemyFace").src = player1.url
+      document.getElementById("enemyName").innerHTML = player1.name
+      document.getElementById("startBattle").disabled = false
+
+      channel.publish("sendNameWhite", username)
+    }
+  });
+  channel.subscribe("sendNameWhite", (message) => {
     if(player == 1){
+      player0 = {name: message.data, url: `https://api.dicebear.com/7.x/bottts/svg?seed=${message.data}`}
       document.getElementById("enemyFace").src = player0.url
       document.getElementById("enemyName").innerHTML = player0.name
     }
-  });
+  })
   channel.subscribe('leave', (message) => {
     document.getElementById("enemyFace").src = `./img/blacked_out_player.svg`
     document.getElementById("enemyName").innerHTML = "Player 2"
@@ -89,13 +99,12 @@ function addChannelListeners(){
     else winBattle()
   });
   channel.subscribe('restart', (message) => {
-    
+    resign = false
     if(rematch == true && player.toString() == message.data){
       channel.publish('rematchAccepted', player.toString())
     } 
 
     if(player.toString() != message.data) {
-      console.log(player.toString(), message.data)
       rematch = true
     } else {
       rematch = false
@@ -108,7 +117,7 @@ function addChannelListeners(){
     battleBoard.position(battleGame.fen())
 
     document.getElementById("battleBoard").removeChild(document.getElementById("battleBoardFilter"))
-    if(player == 0) startBattle()
+    if(player == 0) enableBoardMovement()
   })
 }
 
@@ -129,7 +138,10 @@ function enableAllButtons(){
   document.getElementById("submitCode").disabled = false
 }
 function backRoom(){
+    player = 1
+    battleBoard = Chessboard('battleBoard', config)
     enableAllButtons()
+    resign = false
     battleGame = new Chess()
     battleBoard.position(battleGame.fen())
     joinRoomEle.classList.add("hidden")
@@ -172,7 +184,7 @@ function submitCode(){
       addChannelListeners()
       disableAllButtons()
       enableBoardMovement() 
-      channel.publish('join', player.toString());
+      channel.publish('join', username);
 
       //go to room section
       joinRoomEle.classList.add("hidden")
@@ -221,20 +233,7 @@ async function generateMove (){
 
   if(!resign) channel.publish('move',  { player: player, move: moveToSend})
 }
-function checkBattleGameOver(){
-  if (battleGame.game_over() && !document.getElementById('botContainer').classList.contains("no_access")){
-    document.getElementById('face_speechbox').innerHTML = 'Good game!'
-    stopGame = true
-    startButtonEle.disabled = false
 
-    document.getElementById('botContainer').classList.remove("no_opacity")
-    document.getElementById('main_info_container').classList.remove("no_access")
-    startButtonEle.disabled = false
-    return
-  } else if(game.game_over()){
-    resign()
-  }
-}
 function enableBoardMovement(){
   //board logic
   function onDragStart (source, piece, position, orientation) {
@@ -263,6 +262,7 @@ function enableBoardMovement(){
   }
   async function onSnapEnd () {
     battleBoard.position(battleGame.fen())
+    //check if gameove
   }
   var config = {
     draggable: true,

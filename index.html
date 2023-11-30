@@ -45,7 +45,7 @@
             <i class="fa-solid fa-sun" style="margin-right: 10px;"></i><a>LIGHT MODE</a>
         </div>
     </div>
-    <div id="main" class="hidden"  style="display: flex; width: 100vw; align-items: flex-end;">
+    <div id="main"  style="display: flex; width: 100vw; align-items: flex-end;">
         <div class="sidebar_placeholder" style="width: 10vw; height: 100vh; margin-left: auto;">
 
         </div>
@@ -97,7 +97,7 @@
             </div>
         </div>
     </div>
-    <div id="battle" style="display: flex; width: 100vw; align-items: flex-end;">
+    <div id="battle" class="hidden" style="display: flex; width: 100vw; align-items: flex-end;">
         <div style="width: 10vw; height: 100vh; margin-left: auto;">
 
         </div>
@@ -117,7 +117,15 @@
         </div>
         <div id="main_info_container" class="main_container" style=" margin-top: 20px; margin-right: auto; position: relative;">
             <p style="font-size: 2rem; font-family: 'header_main'; color: var(--secondary); position: absolute; top: 0; left: 50%; transform: translate(-50%, 0);">Rooms</p>
-            <div id="roomContainer" style="position: relative; display: flex; flex-direction: column; align-items: center; margin: auto; padding-bottom: 50px;
+            <div id="registerContainer" style="position: relative; display: flex; flex-direction: column; align-items: center; margin: auto; padding-bottom: 50px;
+            border-bottom: 2px solid var(--background);
+            width: 99%;">
+                <div>
+                    <input autocomplete="off" placeholder="Enter username" id="username">
+                    <button id="submitUsername" onclick="submitUsername()">Confirm</button>
+                </div>
+            </div>
+            <div class="hidden" id="roomContainer" style="position: relative; display: flex; flex-direction: column; align-items: center; margin: auto; padding-bottom: 50px;
             border-bottom: 2px solid var(--background);
             width: 99%;">
                 <div id="roomMenu">
@@ -130,12 +138,6 @@
                         <p id="roomNumber" style="font-family: 'header_main'; font-size: 1.2rem; display: inline;">Code: 1234</p>
                         <button id="startBattle" onclick="startBattle()" disabled>Start</button>
                     </div>
-                    <!-- <div id="membersList">
-                        <div class="member" id="0">
-                            <p id="playerName">You</p> <img id="playerFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow">
-                            <img id="selected_bot">
-                        </div>
-                    </div> -->
                 </div>
                 <div id="roomJoin" class="hidden">
                     <button onclick="backRoom()" id="exitFromJoinedRoom" style="position: absolute; top: 0; left: 0;"><i class="fa-solid fa-left-long"></i></button>
