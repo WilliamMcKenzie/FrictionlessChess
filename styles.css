@@ -115,7 +115,8 @@ button:hover {
     left: 0;
     top: 0;
     height: 100vh;
-    background-color: var(--sideBarBackground);
+    background: var(--botSelectionBG);
+    background-size: cover;
     box-shadow: var(--boxShadow) 0px 3px 8px;
     z-index: 3;
 
@@ -142,7 +143,7 @@ button:hover {
     font-family: 'bold';
     text-align:start;
     color: var(--sideBarFont);
-    background-color: var(--sideBarBackground);
+    background-color: var(--backgroundLight);
 }
 .side_bar_navigation:hover {
     cursor: pointer !important;
@@ -155,6 +156,7 @@ button:hover {
     font-size: 1.25rem !important;
     color: var(--sideBarHeader) !important;
     border-bottom: 2px solid var(--background);
+    background-color: transparent !important;
 }
 
 .logo {

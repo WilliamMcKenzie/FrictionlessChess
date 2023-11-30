@@ -298,17 +298,3 @@ function battleBots(){
     selectedBot = game.turn() == "b" ? 1 : 0
     window.setTimeout(moveCustomBot, 1000)
   }
-
-  function resign(){
-    if(document.getElementById('main_info_container').classList.contains("no_access")){
-      stopGame = true
-      startButtonEle.disabled = false
-  
-      document.getElementById('botContainer').classList.remove("no_opacity")
-      document.getElementById('main_info_container').classList.remove("no_access")
-      startButtonEle.disabled = false
-    } else {
-      board = Chessboard('board', config)
-      game = new Chess()
-    }
-  }

@@ -134,7 +134,7 @@ function checkGameOver(){
     startButtonEle.disabled = false
     return
   } else if(game.game_over()){
-    resign()
+    resignGame()
   }
 }
 async function moveCustomBot(){
@@ -240,6 +240,19 @@ function saySomething(){
   else face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
 
   robotNameEle.innerHTML = bot.name
+}
+function resignGame(){
+  if(document.getElementById('main_info_container').classList.contains("no_access")){
+    stopGame = true
+    startButtonEle.disabled = false
+
+    document.getElementById('botContainer').classList.remove("no_opacity")
+    document.getElementById('main_info_container').classList.remove("no_access")
+    startButtonEle.disabled = false
+  } else {
+    board = Chessboard('board', config)
+    game = new Chess()
+  }
 }
 
 

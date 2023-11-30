@@ -50,7 +50,7 @@ function addChannelListeners(){
       }
     }
   });
-  channel.subcribe('updatePlayerCards', (message) => {
+  channel.subscribe('updatePlayerCards', (message) => {
     if(message.data.player == 0 && player == 1)
     {
       player0 = {name: message.data.name, url: `https://api.dicebear.com/7.x/bottts/svg?seed=${message.data.icon}`}
@@ -160,13 +160,12 @@ function joinRoom(){
 function createRoom(){
     createdRoomEle.classList.remove("hidden") 
     roomMenu.classList.add("hidden") 
-
     var roomCode = codewords[Math.round(Math.random()*codewords.length)] 
     
     channel = ably.channels.get(roomCode.toString());
     player = 0
-    addChannelListeners()
     document.getElementById("roomNumber").innerHTML = `Code: ${roomCode}`
+    channel.subsrcibe
 }
 function submitCode(){
   var roomCode = document.getElementById("roomRequest").value
