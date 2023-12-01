@@ -97,7 +97,9 @@ function evaluateLocal(gameToEval, side, fen){
 function gatherFunctions(){
   var functions = [homoFunction, sanderFunction, barleyFunction, chesterFunction, makeRandomMove, depthSearch, depthSearchMed, getBestMove, evaluateLocal, findTile, shuffle]
   for(var customBot of customBots){
-    functions.push(customBot.function.toString())
+    if(customBot.name){
+      functions.push(customBot.function.toString())
+    }
   }
   for(var addedFunction of addedFunctions){
     functions.push(addedFunction.addedFunction.toString())

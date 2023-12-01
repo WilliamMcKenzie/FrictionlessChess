@@ -49,41 +49,37 @@ function addChannelListeners(){
       }
     }
   });
-  channel.subscribe('updatePlayerCards', (message) => {
-    if(message.data.player == 0 && player == 1)
-    {
-      player0 = {name: message.data.name, url: `https://api.dicebear.com/7.x/bottts/svg?seed=${message.data.icon}`}
-      document.getElementById("enemyFace").src = player0.url
-      document.getElementById("enemyName").innerHTML = player0.name
-    } 
-    else if(message.data.player == 1 && player == 0)
-    {
-      player1 = {name: message.data, url: `https://api.dicebear.com/7.x/bottts/svg?seed=${message.data}`}
-      document.getElementById("enemyFace").src = player1.url
-      document.getElementById("enemyName").innerHTML = player1.name
-      document.getElementById("startBattle").disabled = false
-    }
-  })
   channel.subscribe('join', (message) => {
     if(player == 0){
-      player1 = {name: message.data.name, url: message.data.icon}
+      player1 = {name: message.data.name, url: message.data.icon, bot: message.data.bot}
       document.getElementById("enemyFace").src = player1.url
+      if(player1.bot == "You"){
+        document.getElementById("enemyBot").innerHTML = "Player 2"
+      } else {
+        document.getElementById("enemyBot").innerHTML = player1.bot
+      }
       document.getElementById("enemyName").innerHTML = player1.name
       document.getElementById("startBattle").disabled = false
 
-      channel.publish("sendNameWhite", {name: username, icon: selectedBattleBot.uniqueFunctionParams ? `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBattleBot.name}` : selectedBattleBot.name == "You" ? `https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0` : `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBattleBot.faceCode}`})
+      channel.publish("sendNameWhite", {name: username, icon: selectedBattleBot.uniqueFunctionParams ? `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBattleBot.name}` : selectedBattleBot.name == "You" ? `https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0` : `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBattleBot.faceCode}`, bot: selectedBattleBot.name})
     }
   });
   channel.subscribe("sendNameWhite", (message) => {
     if(player == 1){
-      player0 = {name: message.data.name, url: message.data.icon}
+      player0 = {name: message.data.name, url: message.data.icon, bot: message.data.bot}
       document.getElementById("enemyFace").src = player0.url
+      if(player0.bot == "You"){
+        document.getElementById("enemyBot").innerHTML = "Player 2"
+      } else {
+        document.getElementById("enemyBot").innerHTML = player0.bot
+      }
       document.getElementById("enemyName").innerHTML = player0.name
     }
   })
   channel.subscribe('leave', (message) => {
     document.getElementById("enemyFace").src = `./img/blacked_out_player.svg`
     document.getElementById("enemyName").innerHTML = "Player 2"
+    document.getElementById("enemyBot").innerHTML = 'None'
     document.getElementById("startBattle").disabled = true
   });
   channel.subscribe('startGame', (message) => {
@@ -123,12 +119,15 @@ function addChannelListeners(){
 
     if(bot.name == "You" && message.data.player != player){
       document.getElementById("enemyFace").src = 'https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0'
+      document.getElementById("enemyBot").innerHTML = "Player 2"
     } 
     else if(bot.uniqueFunctionParams && message.data.player != player){
       document.getElementById("enemyFace").src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
+      document.getElementById("enemyBot").innerHTML = bot.name
     }
     else if(message.data.player != player){
       document.getElementById("enemyFace").src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.faceCode}`
+      document.getElementById("enemyBot").innerHTML = bot.name
     }
   })
 }
@@ -160,6 +159,11 @@ function backRoom(){
     createdRoomEle.classList.add("hidden")  
     roomMenu.classList.remove("hidden") 
     if(document.getElementById("battleBoardFilter")) document.getElementById("battleBoard").removeChild(document.getElementById("battleBoardFilter"))
+
+    document.getElementById("enemyFace").src = `./img/blacked_out_player.svg`
+    document.getElementById("enemyName").innerHTML = "Player 2"
+    document.getElementById("enemyBot").innerHTML = 'None'
+    document.getElementById("startBattle").disabled = true
 
     channel.publish('gameOver', player.toString());
     channel.publish('leave', player.toString());
@@ -196,7 +200,7 @@ function submitCode(){
       addChannelListeners()
       disableAllButtons()
       enableBoardMovement() 
-      channel.publish('join', {name: username, icon: selectedBattleBot.uniqueFunctionParams ? `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBattleBot.name}` : selectedBattleBot.name == "You" ? `https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0` : `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBattleBot.faceCode}`});
+      channel.publish('join', {name: username, icon: selectedBattleBot.uniqueFunctionParams ? `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBattleBot.name}` : selectedBattleBot.name == "You" ? `https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0` : `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBattleBot.faceCode}`, bot: selectedBattleBot.name});
 
       //go to room section
       joinRoomEle.classList.add("hidden")
@@ -231,19 +235,23 @@ function loseBattle(){
 async function generateMove (){
   var functions = gatherFunctions()
 
-  await sendToWorker(battleGame.fen(), functions, selectedBattleBot.function.name, selectedBattleBot.uniqueFunctionParams ? true : false)
-  moveToSend = result
+  if(selectedBattleBot.function){
+    await sendToWorker(battleGame.fen(), functions, selectedBattleBot.function.name, selectedBattleBot.uniqueFunctionParams ? true : false)
+    moveToSend = result
 
-  //move piece, update board, & have bot say dialogue
-  battleGame.move(moveToSend)
-  battleBoard.position(battleGame.fen())
+    //move piece, update board, & have bot say dialogue
+    battleGame.move(moveToSend)
+    battleBoard.position(battleGame.fen())
 
-  if(battleGame.game_over()){
-    channel.publish("gameOver",  player == 0 ? "1" : "0")
-    return
+    if(battleGame.game_over()){
+      channel.publish("gameOver",  player == 0 ? "1" : "0")
+      return
+    }
+
+    if(!resign) channel.publish('move',  { player: player, fen: battleGame.fen()})
+  } else {
+    enableBoardMovement()
   }
-
-  if(!resign) channel.publish('move',  { player: player, fen: battleGame.fen()})
 }
 
 function enableBoardMovement(){
@@ -267,14 +275,14 @@ function enableBoardMovement(){
       to: target,
       promotion: 'q' // NOTE: always promote to a queen for example simplicity
     })
+    console.log(move, battleGame.fen())
 
     // illegal move
     if (move === null) return 'snapback'
-    channel.publish('move',  { player: player, move: move})
+    channel.publish('move',  { player: player, fen: battleGame.fen()})
   }
   async function onSnapEnd () {
     battleBoard.position(battleGame.fen())
-    //check if gameove
   }
   var config = {
     draggable: true,

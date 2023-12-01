@@ -147,19 +147,31 @@ function addNewCodeSection(bot){
   }
   
   function trashBot(id, index){
-    var botNUM = index
-    var botContainer = document.getElementById('botContainer')
     var createBotButton = document.getElementById('createBotButton')
   
-    var script = document.getElementById(`script${botNUM}`);
+    var script = document.getElementById(`script${index}`);
     document.head.removeChild(script)
+
     botContainer.removeChild(document.getElementById(id))
-  
+    battleBotContainer.removeChild(document.getElementById(`battle${id}`))
+    analysisBotContainer.removeChild(document.getElementById(`analysis${id}`))
+
     for(var i = 0; i < customBots.length; i++){
-      if(customBots[i].id == id) customBots.splice(i, 1)
+      if(customBots[i].id == id) customBots[i] = {name: null}
     }
     document.getElementById('codeContainer').removeChild(document.getElementById(`codeSection${id}`))
     botScriptCount--
+
+    if(selectedBots[0].id == id){
+      selectedBots[0] = addedBots[1]
+    } 
+    if(selectedBots[1].id == id){
+      selectedBots[1] = addedBots[1]
+    }
+    if(selectedBots[1].id == id || selectedBots[0].id == id){
+      activateBot(1)
+      activateBot(1)
+    }
   }
   function trashCode(index){
     var script = document.getElementById(`script${index}`);
@@ -189,10 +201,17 @@ function addNewCodeSection(bot){
   }
   
   function updateBotName(botNUM){
+    var oldName = customBots[botNUM-1].name
     customBots[botNUM-1].name = document.getElementById(`botNameElement${botNUM}`).value
     var bot = customBots[botNUM-1]
-  
+
     document.getElementById(bot.id).childNodes[0].src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
+    document.getElementById(`battle${bot.id}`).childNodes[0].src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
+    document.getElementById(`analysis${bot.id}`).childNodes[0].src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
+
+    activateCustomBot(bot)
+    activateCustomAnalysisBot(bot)
+    activateCustomBattleBot(bot)
   }
 
 
