@@ -309,14 +309,14 @@ function alterSelectedBots(newBot){
 }
 function addPlayersToBoardAddon(){
   if(selectedBots[1].faceCode){
-    if(selectedBots[1].name == "You") topFace.src = `https://api.dicebear.com/7.x/personas/svg?seed=Shadow`
+    if(selectedBots[1].name == "You") topFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0`
     else topFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[1].faceCode}`
   }else{
     topFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[1].name}`
   }
 
   if(selectedBots[0].faceCode){
-    if(selectedBots[0].name == "You") bottomFace.src = `https://api.dicebear.com/7.x/personas/svg?seed=Shadow`
+    if(selectedBots[0].name == "You") bottomFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0`
     else bottomFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[0].faceCode}`
   }else{
     bottomFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[0].name}`
@@ -327,7 +327,7 @@ function addPlayersToBoardAddon(){
 }
 function activateBot(botID){
   if(addedBots[botID].name == "You"){
-    face.src = `https://api.dicebear.com/7.x/personas/svg?seed=Shadow`
+    face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0`
 
     robotNameEle.innerHTML = addedBots[botID].name
     speech.innerHTML = "Let's do this!"

@@ -192,7 +192,7 @@ function addNewCodeSection(bot){
     customBots[botNUM-1].name = document.getElementById(`botNameElement${botNUM}`).value
     var bot = customBots[botNUM-1]
   
-    document.getElementById(bot.id).style.backgroundImage = `url("https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}")`
+    document.getElementById(bot.id).childNodes[0].src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
   }
 
 

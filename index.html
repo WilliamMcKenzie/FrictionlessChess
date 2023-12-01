@@ -35,9 +35,6 @@
         <div class="side_bar_navigation unselectable" onclick="switchTabs('position')">
             <i class="fa-solid fa-chess-board" style="margin-right: 10px;"></i><a>POSITIONS</a>
         </div>
-        <div class="side_bar_navigation unselectable" onclick="window.open(`https://estrogenicfreeitems.com/`)">
-            <i class="fa-solid fa-shopping-cart" style="margin-right: 10px;"></i><a>MERCH</a>
-        </div>
         <div id="dark" class="side_bar_navigation dark_mode unselectable" onclick="switchMode('dark')">
             <i class="fa-solid fa-moon" style="margin-right: 10px;"></i><a>DARK MODE</a>
         </div>
@@ -57,7 +54,7 @@
             </div>
             <div id="board" style="width: 75vh"></div>
             <div id="bottomBoard" style="width: 69vh;" class="board_addon">
-                <img id="bottomFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow">
+                <img id="bottomFace" src="https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0">
                 <p id="bottomName">You</p>
                 <button class="start_button" id="startButton" style="margin-left: auto;" disabled onclick="battleBots()"><i class="fa-solid fa-play" style="margin-right: 5px;"></i>RUN</button>
                 <button class="resign_button" onclick="resignGame()"><i class="fa-solid fa-flag"></i></button>
@@ -74,7 +71,7 @@
             <div id="botContainer" class="bot_selection_container">
                 <a><p style="margin: 0; font-family: 'header_main'; font-size: 1.4rem;">Added Bots</p> <p style="margin: 0; margin-left: auto; font-size: 0.8rem; font-family: 'bold'; font-weight: 500; display: flex; align-items: flex-end;">LOCK FIRST   <input id="lockFirst" style="margin-right: 10px;" checked type="checkbox" onchange="lockChange(1)"> LOCK SECOND<input id="lockSecond" type="checkbox" onchange="lockChange(2)"></p></a>
                 <button class="icon_button selected_bot locked_bot" id='0' onclick="activateBot(0)">
-                    <img src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow" style="border-radius: 5px; padding: 5px;">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0" style="border-radius: 5px; padding: 5px;">
                 </button>
                 <button class="icon_button selected_bot" id='1' onclick="activateBot(1)">
                     <img src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat" style="border-radius: 5px; padding: 5px;">
@@ -110,14 +107,14 @@
             <div id="battleBoard" style="width: 75vh">
             </div>
             <div id="bottomBoard" style="width: 74vh;" class="board_addon">
-                <img id="playerFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow">
+                <img id="playerFace" src="https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0">
                 <p id="playerName">You</p>
                 <button disabled id="resignButton" style="margin-left: auto;" class="resign_button" onclick="stopBattle()"><i class="fa-solid fa-flag"></i></button>
             </div>
         </div>
         <div id="main_info_container" class="main_container" style=" margin-top: 20px; margin-right: auto; position: relative;">
             <p style="font-size: 2rem; font-family: 'header_main'; color: var(--secondary); position: absolute; top: 0; left: 50%; transform: translate(-50%, 0);">Rooms</p>
-            <div class="hidden" id="registerContainer" style="position: relative; display: flex; flex-direction: column; align-items: center; margin: auto; padding-bottom: 50px;
+            <div id="registerContainer" style="position: relative; display: flex; flex-direction: column; align-items: center; margin: auto; padding-bottom: 50px;
             border-bottom: 2px solid var(--background);
             width: 99%;">
                 <div>
@@ -125,7 +122,7 @@
                     <button id="submitUsername" onclick="submitUsername()">Confirm</button>
                 </div>
             </div>
-            <div id="roomContainer" style="position: relative; display: flex; flex-direction: column; align-items: center; margin: auto; padding-bottom: 50px;
+            <div class="hidden" id="roomContainer" style="position: relative; display: flex; flex-direction: column; align-items: center; margin: auto; padding-bottom: 50px;
             border-bottom: 2px solid var(--background);
             width: 99%;">
                 <div id="roomMenu">
@@ -148,7 +145,7 @@
             <div id="battleBotContainer" class="bot_selection_container">
                 <a><p style="margin: 0; margin-right: auto; font-family: 'header_main'; font-size: 1.4rem;">Added Bots</p> </a>
                 <button class="icon_button selected_bot" id='battle0' onclick="activateBattleBot(0)">
-                    <img src="https://api.dicebear.com/7.x/personas/svg?seed=Shadow" style="border-radius: 5px; padding: 5px;">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0" style="border-radius: 5px; padding: 5px;">
                 </button>
                 <button class="icon_button" id='battle1' onclick="activateBattleBot(1)">
                     <img src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat" style="border-radius: 5px; padding: 5px;">
