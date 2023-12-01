@@ -112,7 +112,10 @@ function addChannelListeners(){
     battleBoard.position(battleGame.fen())
 
     document.getElementById("battleBoard").removeChild(document.getElementById("battleBoardFilter"))
-    if(player == 0) enableBoardMovement()
+    if(player == 0) {
+      enableBoardMovement()
+      document.getElementById("startBattle").disabled = false
+    }
   })
   channel.subscribe('newBot', (message) => {
     var bot = message.data.bot
