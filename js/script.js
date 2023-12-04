@@ -30,23 +30,63 @@ var stopGame = false
 //set up worker to execute move generation
 var result
 const worker = new Worker('./js/worker.js')
-worker.addEventListener('message', function (e) {
-  result = e.data;
+worker.addEventListener('message', function(e) {
+    result = e.data;
 });
-async function sendToWorker(fen, functions, functionToUse, uniqueFunctionParams){
-  var curGame = new Chess(fen)
-  return new Promise((resolve) => {
-    worker.onmessage = function (event) {
-        const result = event.data;
-        resolve(result);
-    };
+async function sendToWorker(fen, functions, functionToUse, uniqueFunctionParams) {
+    var curGame = new Chess(fen)
+    return new Promise((resolve) => {
+        worker.onmessage = function(event) {
+            const result = event.data;
+            resolve(result);
+        };
 
-    worker.postMessage({functions: functions, fen: fen, functionToUse: functionToUse, uniqueFunctionParams: uniqueFunctionParams, side: curGame.turn()});
-  });
+        worker.postMessage({
+            functions: functions,
+            fen: fen,
+            functionToUse: functionToUse,
+            uniqueFunctionParams: uniqueFunctionParams,
+            side: curGame.turn()
+        });
+    });
 }
 
 //defining the current bots that user has access to, as well as custom functions
-var addedBots = [{name: 'You', faceCode: 'Shadow', id: 0},{name: 'Potlick', faceCode: 'skinnyfat', id: 1, function: makeRandomMove, lines: dialogueOptions.dummy}, {name: 'Chester', faceCode: 'meditti', id: 2, function: chesterFunction, lines: dialogueOptions.easy}, {name: 'Barley', faceCode: 'hamza', id: 3, function: barleyFunction, lines: dialogueOptions.medium}, {name: 'Sander', faceCode: 'pooper', id: 4, function: sanderFunction, lines: dialogueOptions.hard}, {name: 'Master Homo-Yo', faceCode: 'earss', id: 5, function: homoFunction, lines: dialogueOptions.ultimate}]
+var addedBots = [{
+    name: 'You',
+    faceCode: 'Shadow',
+    id: 0
+}, {
+    name: 'Potlick',
+    faceCode: 'skinnyfat',
+    id: 1,
+    function: makeRandomMove,
+    lines: dialogueOptions.dummy
+}, {
+    name: 'Chester',
+    faceCode: 'meditti',
+    id: 2,
+    function: chesterFunction,
+    lines: dialogueOptions.easy
+}, {
+    name: 'Barley',
+    faceCode: 'hamza',
+    id: 3,
+    function: barleyFunction,
+    lines: dialogueOptions.medium
+}, {
+    name: 'Sander',
+    faceCode: 'pooper',
+    id: 4,
+    function: sanderFunction,
+    lines: dialogueOptions.hard
+}, {
+    name: 'Master Homo-Yo',
+    faceCode: 'earss',
+    id: 5,
+    function: homoFunction,
+    lines: dialogueOptions.ultimate
+}]
 var customBots = []
 var addedFunctions = []
 
@@ -56,7 +96,7 @@ var evalScriptCount = 0
 var shuffleScriptCount = 0
 
 //defining which bots are currently selected in the main tab
-var selectedBots = [addedBots[0],addedBots[1]]
+var selectedBots = [addedBots[0], addedBots[1]]
 var selectedBot = 0
 var selectedAnalysisBot = addedBots[1]
 var selectedBattleBot = addedBots[0]
@@ -67,412 +107,497 @@ var selectedDepth = -1
 var side = 'b'
 var optimalMove
 
-function evaluateLocal(gameToEval, side, fen){
-  var total = 0
-  var layout = fen.split(" ")[0]
+function evaluateLocal(gameToEval, side, fen) {
+    var total = 0
+    var layout = fen.split(" ")[0]
 
-  var posX = 0
-  var posY = 0
+    var posX = 0
+    var posY = 0
 
-  var positionValue = 0
+    var positionValue = 0
 
-  for(var digit of layout){
-    if(pieceVal[digit]){
-      positionValue += positionMap[digit][posX][posY]*(digit.toUpperCase() == digit ? -0.5 : 0.5)
-      total += (pieceVal[digit]*(side == 'w' ? -1 : 1))
-      posX++
+    for (var digit of layout) {
+        if (pieceVal[digit]) {
+            positionValue += positionMap[digit][posX][posY] * (digit.toUpperCase() == digit ? -0.5 : 0.5)
+            total += (pieceVal[digit] * (side == 'w' ? -1 : 1))
+            posX++
+        } else if (digit != '/') {
+            posX++
+        } else {
+            posY++
+            posX = 0
+        }
     }
-    else if(digit != '/'){
-      posX++
-    }else {
-      posY++
-      posX = 0
-    }
-  }
-  return total+positionValue
+    return total + positionValue
 }
 //group all bot functions 
 //(move generation, board evaluation, and whatever else user creates) into 1 variable
 //to later send to worker file
-function gatherFunctions(){
-  var functions = [homoFunction, sanderFunction, barleyFunction, chesterFunction, makeRandomMove, depthSearch, depthSearchMed, getBestMove, evaluateLocal, findTile, shuffle]
-  for(var customBot of customBots){
-    if(customBot.name){
-      functions.push(customBot.function.toString())
+function gatherFunctions() {
+    var functions = [homoFunction, sanderFunction, barleyFunction, chesterFunction, makeRandomMove, depthSearch, depthSearchMed, getBestMove, evaluateLocal, findTile, shuffle]
+    for (var customBot of customBots) {
+        if (customBot.name) {
+            functions.push(customBot.function.toString())
+        }
     }
-  }
-  for(var addedFunction of addedFunctions){
-    functions.push(addedFunction.addedFunction.toString())
-  }
-  for (let i = 0; i < functions.length; i++) {
-    functions[i] = functions[i].toString()
-  }
-  return functions
+    for (var addedFunction of addedFunctions) {
+        functions.push(addedFunction.addedFunction.toString())
+    }
+    for (let i = 0; i < functions.length; i++) {
+        functions[i] = functions[i].toString()
+    }
+    return functions
 }
-async function moveAI () {
-  var functions = gatherFunctions()
+async function moveAI() {
+    var functions = gatherFunctions()
 
-  await sendToWorker(game.fen(), functions, selectedBots[selectedBot].function.name, selectedBots[selectedBot].uniqueFunctionParams ? true : false)
-  optimalMove = result
+    await sendToWorker(game.fen(), functions, selectedBots[selectedBot].function.name, selectedBots[selectedBot].uniqueFunctionParams ? true : false)
+    optimalMove = result
 
-  //move piece, update board, & have bot say dialogue
-  if(!stopGame){
-    game.move(optimalMove)
-    board.position(game.fen())
-    saySomething()
-    checkGameOver()
-  }
+    //move piece, update board, & have bot say dialogue
+    if (!stopGame) {
+        game.move(optimalMove)
+        board.position(game.fen())
+        saySomething()
+        checkGameOver()
+    }
 
-  selectedBot == 0 ? selectedBot = 1 : selectedBot = 0
+    selectedBot == 0 ? selectedBot = 1 : selectedBot = 0
 }
-function checkGameOver(){
-  if (game.game_over() && !document.getElementById('botContainer').classList.contains("no_access")){
-    document.getElementById('face_speechbox').innerHTML = 'Good game!'
-    stopGame = true
-    startButtonEle.disabled = false
 
-    document.getElementById('botContainer').classList.remove("no_opacity")
-    document.getElementById('main_info_container').classList.remove("no_access")
-    startButtonEle.disabled = false
-    return
-  } else if(game.game_over()){
-    resignGame()
-  }
+function checkGameOver() {
+    if (game.game_over() && !document.getElementById('botContainer').classList.contains("no_access")) {
+        document.getElementById('face_speechbox').innerHTML = 'Good game!'
+        stopGame = true
+
+        document.getElementById('botContainer').classList.remove("no_opacity")
+        document.getElementById('main_info_container').classList.remove("no_access")
+        return
+    } else if (game.game_over()) {
+        resignGame()
+    }
 }
-async function moveCustomBot(){
-  side = game.turn()
-  console.log(side, selectedBot, selectedBots)
-  await moveAI()
+async function moveCustomBot() {
+    side = game.turn()
+    await moveAI()
 
-  if(!stopGame){
-    window.setTimeout(moveCustomBot, 1000)
-  } else {
-    return
-  }
+    if (!stopGame) {
+        window.setTimeout(moveCustomBot, 1000)
+    } else {
+        return
+    }
 }
 
 
 //board logic
-function onDragStart (source, piece, position, orientation) {
-  // do not pick up pieces if the game is over
-  if (game.game_over()) return false
+function onDragStart(source, piece, position, orientation) {
+    // do not pick up pieces if the game is over
+    if (game.game_over()) return false
 
-  // only pick up pieces for the side to move
-  if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
-      (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
-    return false
-  }
+    // only pick up pieces for the side to move
+    if ((game.turn() === 'w' && piece.search(/^b/) !== -1) ||
+        (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+        return false
+    }
 }
-async function onDrop (source, target) {
-  // see if the move is legal
-  var move = game.move({
-    from: source,
-    to: target,
-    promotion: 'q' // NOTE: always promote to a queen for example simplicity
-  })
+async function onDrop(source, target) {
+    // see if the move is legal
+    var move = game.move({
+        from: source,
+        to: target,
+        promotion: 'q' // NOTE: always promote to a queen for example simplicity
+    })
 
-  // illegal move
-  if (move === null) return 'snapback'
-  moveHistory.push(game.fen())
-  selectedBot == 0 ? selectedBot = 1 : selectedBot = 0
+    // illegal move
+    if (move === null) return 'snapback'
+    moveHistory.push(game.fen())
+    selectedBot == 0 ? selectedBot = 1 : selectedBot = 0
 
-  side = "b"
-  await sleep(500)
-  window.setTimeout(moveAI(), 0);
-  board.position(game.fen())
+    side = "b"
+    await sleep(500)
+    window.setTimeout(moveAI(), 0);
+    board.position(game.fen())
 }
-async function onSnapEnd () {
-  board.position(game.fen())
+async function onSnapEnd() {
+    board.position(game.fen())
 }
 var config = {
-  draggable: true,
-  position: 'start',
-  onDragStart: onDragStart,
-  onDrop: onDrop,
-  onSnapEnd: onSnapEnd
+    draggable: true,
+    position: 'start',
+    onDragStart: onDragStart,
+    onDrop: onDrop,
+    onSnapEnd: onSnapEnd
 }
 board = Chessboard('board', config)
 
 
 //utilities
 function shuffle(array) {
-  let currentIndex = array.length,  randomIndex;
+    let currentIndex = array.length,
+        randomIndex;
 
-  // While there remain elements to shuffle.
-  while (currentIndex > 0) {
+    // While there remain elements to shuffle.
+    while (currentIndex > 0) {
 
-    // Pick a remaining element.
-    randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
+        // Pick a remaining element.
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
 
-    // And swap it with the current element.
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex], array[currentIndex]];
-  }
-
-  return array;
-}
-function findTile(move){
-  var res = ''
-  for(var digit of move){
-    if(digit.toUpperCase() != digit && digit != 'x'){
-      res += digit
+        // And swap it with the current element.
+        [array[currentIndex], array[randomIndex]] = [
+            array[randomIndex], array[currentIndex]
+        ];
     }
-  }
-  return res
-}
-function onFenEdit(){
-  game = new Chess(fenEle.value)
-  board.position(game.fen())
-}
-function reset(){
-  game = new Chess()
-  board.position(game.fen())
-}
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+
+    return array;
 }
 
-function saySomething(){
-  var bot = selectedBots[selectedBot]
-  var randomIdx = Math.floor(Math.random() * bot.lines.length)
-  speech.innerHTML = bot.lines[randomIdx]
-
-  if(bot.faceCode) face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.faceCode}`
-  else face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
-
-  robotNameEle.innerHTML = bot.name
+function findTile(move) {
+    var res = ''
+    for (var digit of move) {
+        if (digit.toUpperCase() != digit && digit != 'x') {
+            res += digit
+        }
+    }
+    return res
 }
-function resignGame(){
-  if(document.getElementById('main_info_container').classList.contains("no_access")){
-    stopGame = true
-    startButtonEle.disabled = false
 
-    document.getElementById('botContainer').classList.remove("no_opacity")
-    document.getElementById('main_info_container').classList.remove("no_access")
-    startButtonEle.disabled = false
-  } else {
-    board = Chessboard('board', config)
+function onFenEdit() {
+    game = new Chess(fenEle.value)
+    board.position(game.fen())
+}
+
+function reset() {
     game = new Chess()
-  }
+    board.position(game.fen())
+}
+async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function addCookie(subject, value) {
+    document.cookie = `${subject}=${value}`
+}
+// function getCookies(){
+//   let cookies = document.cookie;
+//   cookies = cookies.split(";")
+
+//   for(var cookie of cookies){
+//     var cookieName = cookie.split("=")[0].trim()
+//     var content = cookie.split("=")[1]
+
+//     if(cookieName == "bots")
+//     {
+//       customBots = JSON.parse(content)
+
+//       botContainer.removeChild(document.getElementById('createBotButton'))
+//       analysisBotContainer.removeChild(document.getElementById('createAnalysisBotButton'))
+//       battleBotContainer.removeChild(document.getElementById('createBattleBotButton'))
+//       for(var bot of customBots){
+
+//           var botHTML = document.createElement('button')
+//           var botIcon = document.createElement('img')
+
+//           botIcon.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
+//           botHTML.appendChild(botIcon)
+//           botHTML.classList.add('icon_button')
+
+//           var buttonRegular = botHTML
+//           buttonRegular.onclick = function() {
+//             activateCustomBot(bot)  
+//           }
+//           buttonRegular.id = `${bot.id}`
+//           botContainer.appendChild(buttonRegular)
+
+//           var buttonAnalysis = botHTML
+//           buttonAnalysis.onclick = function() {
+//             activateCustomAnalysisBot(bot)  
+//           }
+//           buttonAnalysis.id = `analysis${bot.id}`
+//           analysisBotContainer.appendChild(buttonAnalysis)
+
+//           var buttonBattle = botHTML
+//           buttonBattle.onclick = function() {
+//             activateBattleBot(bot)  
+//           }
+//           buttonBattle.id = `battle${bot.id}`
+//           battleBotContainer.appendChild(buttonBattle)
 
 
+//           botContainer.appendChild(createBotButton)
+//           analysisBotContainer.appendChild(createAnalysisBotButton)
+//           battleBotContainer.appendChild(createBattleBotButton)
 
-function lockChange(which){
-  if(which == 1) {
-    lockFirst == true ? lockFirst = false : lockFirst = true
+//           document.getElementById(`analysis${selectedAnalysisBot.id}`).classList.add("selected_bot")
+//       }
+//     }
+//     else if(cookieName == "username")
+//     {
+//       username = content
+//     }
+//   }
+// }
 
-    if(lockFirst){
-      document.getElementById(selectedBots[0].id.toString()).classList.add('locked_bot')
+function saySomething() {
+    var bot = selectedBots[selectedBot]
+    var randomIdx = Math.floor(Math.random() * bot.lines.length)
+    speech.innerHTML = bot.lines[randomIdx]
+
+    if (bot.faceCode) face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.faceCode}`
+    else face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
+
+    robotNameEle.innerHTML = bot.name
+}
+
+function resignGame() {
+    if (document.getElementById('main_info_container').classList.contains("no_access")) {
+        stopGame = true
+        startButtonEle.disabled = false
+
+        document.getElementById('botContainer').classList.remove("no_opacity")
+        document.getElementById('main_info_container').classList.remove("no_access")
+        startButtonEle.disabled = false
     } else {
-      document.getElementById(selectedBots[0].id.toString()).classList.remove('locked_bot')
+        board = Chessboard('board', config)
+        game = new Chess()
     }
-  } else {
-    lockSecond == true ? lockSecond = false : lockSecond = true
+}
 
-    if(lockSecond){
-      document.getElementById(selectedBots[1].id.toString()).classList.add('locked_bot')
+
+
+
+function lockChange(which) {
+    if (which == 1) {
+        lockFirst == true ? lockFirst = false : lockFirst = true
+
+        if (lockFirst) {
+            document.getElementById(selectedBots[0].id.toString()).classList.add('locked_bot')
+        } else {
+            document.getElementById(selectedBots[0].id.toString()).classList.remove('locked_bot')
+        }
     } else {
-      document.getElementById(selectedBots[1].id.toString()).classList.remove('locked_bot')
+        lockSecond == true ? lockSecond = false : lockSecond = true
+
+        if (lockSecond) {
+            document.getElementById(selectedBots[1].id.toString()).classList.add('locked_bot')
+        } else {
+            document.getElementById(selectedBots[1].id.toString()).classList.remove('locked_bot')
+        }
     }
-  }
 }
-function alterSelectedBots(newBot){
-  var oldClassList = document.getElementById(selectedBots[0].id).classList
-  var newClassList = document.getElementById(newBot.id.toString()).classList
 
-  if(lockFirst && lockSecond){
-    return
-  }
-  if(lockFirst){
-    document.getElementById(selectedBots[1].id).classList.remove('selected_bot')
-    newClassList.add('selected_bot')
-    selectedBots.pop()
-    selectedBots.push(newBot)
+function alterSelectedBots(newBot) {
+    var oldClassList = document.getElementById(selectedBots[0].id).classList
+    var newClassList = document.getElementById(newBot.id.toString()).classList
 
-    return
-  }
-  if(lockSecond){
-    oldClassList.remove('selected_bot')
-    newClassList.add('selected_bot')
-    selectedBots.shift()
-    selectedBots.unshift(newBot)
+    if (lockFirst && lockSecond) {
+        return
+    }
+    if (lockFirst) {
+        document.getElementById(selectedBots[1].id).classList.remove('selected_bot')
+        newClassList.add('selected_bot')
+        selectedBots.pop()
+        selectedBots.push(newBot)
 
-    return
-  }
-  if(!lockFirst && !lockSecond){
-    oldClassList.remove('selected_bot')
-    newClassList.add('selected_bot')
-    selectedBots.shift()
-    selectedBots.push(newBot)
-  }
+        return
+    }
+    if (lockSecond) {
+        oldClassList.remove('selected_bot')
+        newClassList.add('selected_bot')
+        selectedBots.shift()
+        selectedBots.unshift(newBot)
+
+        return
+    }
+    if (!lockFirst && !lockSecond) {
+        oldClassList.remove('selected_bot')
+        newClassList.add('selected_bot')
+        selectedBots.shift()
+        selectedBots.push(newBot)
+    }
 }
-function addPlayersToBoardAddon(){
-  if(selectedBots[1].faceCode){
-    if(selectedBots[1].name == "You") topFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0`
-    else topFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[1].faceCode}`
-  }else{
-    topFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[1].name}`
-  }
 
-  if(selectedBots[0].faceCode){
-    if(selectedBots[0].name == "You") bottomFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0`
-    else bottomFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[0].faceCode}`
-  }else{
-    bottomFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[0].name}`
-  }
+function addPlayersToBoardAddon() {
+    if (selectedBots[1].faceCode) {
+        if (selectedBots[1].name == "You") topFace.src = `https://api.dicebear.com/7.x/personas/svg?seed=Molly&body=squared&clothingColor=456dff&eyes=open&facialHair[]&facialHairProbability=0&hair=shortCombover&hairColor=6c4545&mouth=smile&nose=smallRound&skinColor=e5a07e`
+        else topFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[1].faceCode}`
+    } else {
+        topFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[1].name}`
+    }
 
-  topName.innerHTML = selectedBots[1].name
-  bottomName.innerHTML = selectedBots[0].name
+    if (selectedBots[0].faceCode) {
+        if (selectedBots[0].name == "You") bottomFace.src = `https://api.dicebear.com/7.x/personas/svg?seed=Molly&body=squared&clothingColor=456dff&eyes=open&facialHair[]&facialHairProbability=0&hair=shortCombover&hairColor=6c4545&mouth=smile&nose=smallRound&skinColor=e5a07e`
+        else bottomFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[0].faceCode}`
+    } else {
+        bottomFace.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedBots[0].name}`
+    }
+
+    topName.innerHTML = selectedBots[1].name
+    bottomName.innerHTML = selectedBots[0].name
 }
-function activateBot(botID){
-  if(addedBots[botID].name == "You"){
-    face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0`
 
+function activateBot(botID) {
+    if (addedBots[botID].name == "You") {
+        face.src = `https://api.dicebear.com/7.x/personas/svg?seed=Molly&body=squared&clothingColor=456dff&eyes=open&facialHair[]&facialHairProbability=0&hair=shortCombover&hairColor=6c4545&mouth=smile&nose=smallRound&skinColor=e5a07e`
+
+        robotNameEle.innerHTML = addedBots[botID].name
+        speech.innerHTML = "Let's do this!"
+
+        alterSelectedBots(addedBots[botID])
+        addPlayersToBoardAddon()
+        disableStart()
+        return
+    }
+
+    face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${addedBots[botID].faceCode}`
+    speech.innerHTML = addedBots[botID].lines[0]
     robotNameEle.innerHTML = addedBots[botID].name
-    speech.innerHTML = "Let's do this!"
 
     alterSelectedBots(addedBots[botID])
     addPlayersToBoardAddon()
+
     disableStart()
-    return
-  }
-
-  face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${addedBots[botID].faceCode}`
-  speech.innerHTML = addedBots[botID].lines[0]
-  robotNameEle.innerHTML = addedBots[botID].name
-
-  alterSelectedBots(addedBots[botID])
-  addPlayersToBoardAddon()
-
-  disableStart()
-}
-function activateCustomBot(bot){
-  face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
-  speech.innerHTML = bot.lines[0]
-  robotNameEle.innerHTML = bot.name
-  
-  alterSelectedBots(bot)
-  addPlayersToBoardAddon()
-
-  disableStart()
 }
 
-function saveBot(scriptId, botNUM) {
-  document.getElementById(`saveButton${botNUM}`).disabled = true
-  var botCode = document.getElementById(`codeInput${botNUM}`).value;
-  var script = document.createElement('script');
-  script.id = scriptId
-  script.innerHTML = botCode
-    
-  document.head.removeChild(document.getElementById(scriptId))
-  document.head.appendChild(script)
-    
-  if(botNUM < 100){
-    var functionReference = window[`bot${botNUM}`]
-    customBots[botNUM-1].function = functionReference
-  } else {
-    for (let i = 0; i < addedFunctions.length; i++) {
-      if(scriptId.includes(addedFunctions[i].id)){
-        addedFunctions[i].addedFunction = eval(`(${botCode})`)
-        addedFunctions[i].name = addedFunctions[i].addedFunction.name
-      }
+function activateCustomBot(bot) {
+    face.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
+    speech.innerHTML = bot.lines[0]
+    robotNameEle.innerHTML = bot.name
+
+    alterSelectedBots(bot)
+    addPlayersToBoardAddon()
+
+    disableStart()
+}
+
+function saveBot(scriptId, botNUM) {  
+    document.getElementById(`saveButton${botNUM}`).disabled = true
+    var botCode = document.getElementById(`codeInput${botNUM}`).value;
+    var script = document.createElement('script');
+    script.id = scriptId
+    script.innerHTML = botCode
+
+    document.head.removeChild(document.getElementById(scriptId))
+    document.head.appendChild(script)
+
+    if (botNUM < 100) {
+        var functionReference = window[`bot${botNUM}`]
+        customBots[botNUM - 1].function = functionReference
+    } else {
+        for (let i = 0; i < addedFunctions.length; i++) {
+            if (scriptId.includes(addedFunctions[i].id)) {
+                addedFunctions[i].addedFunction = eval(`(${botCode})`)
+                addedFunctions[i].name = addedFunctions[i].addedFunction.name
+            }
+        }
     }
-  }
+
+    addCookie('bots', JSON.stringify(customBots))
 }
 
 var analysisConfig = {
-  draggable: true,
-  position: game.fen(),
-  sparePieces: true,
-  onSnapEnd: onAnalysisDragMove
+    draggable: true,
+    position: game.fen(),
+    sparePieces: true,
+    onSnapEnd: onAnalysisDragMove
 }
-function onAnalysisDragMove (newLocation, oldLocation, source,
-  piece, position, orientation) {
+
+function onAnalysisDragMove(newLocation, oldLocation, source,
+    piece, position, orientation) {
     analysisGame = new Chess(analysisBoard.fen() + ' w KQkq - 0 1')
     document.getElementById("fen_ele").value = analysisGame.fen()
 }
 analysisBoard = Chessboard('analysisBoard', analysisConfig)
 var analysisGame = new Chess()
 
-function updateAnalysisBoard(){
-  analysisBotContainer.removeChild(document.getElementById('createAnalysisBotButton'))
+function updateAnalysisBoard() {
+    analysisBotContainer.removeChild(document.getElementById('createAnalysisBotButton'))
 
-  var bot = customBots[customBots.length-1]
-  var botHTML = document.createElement('button')
-  var botIcon = document.createElement('img')
-    
-  botIcon.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
-  botHTML.appendChild(botIcon)
+    var bot = customBots[customBots.length - 1]
+    var botHTML = document.createElement('button')
+    var botIcon = document.createElement('img')
 
-  botHTML.classList.add('icon_button')
-  botHTML.onclick = function() {
-    activateCustomAnalysisBot(bot)  
-  }
-  botHTML.id = `analysis${bot.id}`
+    botIcon.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
+    botHTML.appendChild(botIcon)
 
-  analysisBotContainer.appendChild(botHTML)
+    botHTML.classList.add('icon_button')
+    botHTML.onclick = function() {
+        activateCustomAnalysisBot(bot)
+    }
+    botHTML.id = `analysis${bot.id}`
 
-  analysisBotContainer.appendChild(createAnalysisBotButton)
-  document.getElementById(`analysis${selectedAnalysisBot.id}`).classList.add("selected_bot")
+    analysisBotContainer.appendChild(botHTML)
+
+    analysisBotContainer.appendChild(createAnalysisBotButton)
+    document.getElementById(`analysis${selectedAnalysisBot.id}`).classList.add("selected_bot")
 }
-async function evaluateAnalysisBoard(){
-  var functions = gatherFunctions()
-  var optimalMove
+async function evaluateAnalysisBoard() {
+    var functions = gatherFunctions()
+    var optimalMove
 
-  await sendToWorker(analysisGame.fen(), functions, selectedAnalysisBot.function.name, selectedAnalysisBot.uniqueFunctionParams ? true : false)
-  optimalMove = result
+    await sendToWorker(analysisGame.fen(), functions, selectedAnalysisBot.function.name, selectedAnalysisBot.uniqueFunctionParams ? true : false)
+    optimalMove = result
 
-  analysisGame.move(optimalMove)
-  analysisBoard.position(analysisGame.fen())
-  side = analysisGame.turn()
-  document.getElementById("fen_ele").value = analysisGame.fen()
+    analysisGame.move(optimalMove)
+    analysisBoard.position(analysisGame.fen())
+    side = analysisGame.turn()
+    document.getElementById("fen_ele").value = analysisGame.fen()
 }
 
 //to create and attatch the script tag
 //along with user code to document.head
-function createBot(){
-  var botIndex = customBots.length+1
+function createBot() {
+    var botIndex = customBots.length + 1
 
-  var script = document.createElement('script');
-  script.id = `script${botIndex}`
-  script.innerHTML = 
+    var script = document.createElement('script');
+    script.id = `script${botIndex}`
+    script.innerHTML =
 `function bot${botIndex}(possibleMoves, gameState){
-  //it calls this function for every move, so it returns a RANDOM move from the list of possible moves.
-  var i = Math.floor(Math.random()*possibleMoves.length)
-  return possibleMoves[i]
+    //it calls this function for every move, so it returns a RANDOM move from the list of possible moves.
+    var i = Math.floor(Math.random()*possibleMoves.length)
+    return possibleMoves[i]
 }`
-  document.head.appendChild(script)
+    document.head.appendChild(script)
 
-  var botID = Math.round(Math.random()*10000)
-  var bot = {name: `new bot ${botIndex}`, id: botID, num: botIndex, function: window[`bot${botIndex}`], uniqueFunctionParams: true, lines: ['Beep boop, calculating your defeat...', 'System overload!', 'How does the pawn move again?']}
+    var botID = Math.round(Math.random() * 10000)
+    var bot = {
+        name: `new bot ${botIndex}`,
+        id: botID,
+        num: botIndex,
+        function: window[`bot${botIndex}`],
+        uniqueFunctionParams: true,
+        lines: ['Beep boop, calculating your defeat...', 'System overload!', 'How does the pawn move again?']
+    }
 
-  var botHTML = document.createElement('button')
-  botHTML.classList.add('icon_button')
-  var botIcon = document.createElement('img')
-  botIcon.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
-  botHTML.appendChild(botIcon)
-  botHTML.onclick = function() {activateCustomBot(bot)}
-  botHTML.id = botID
-  
-  botContainer.removeChild(document.getElementById('createBotButton'))
-  botContainer.appendChild(botHTML)
-  botContainer.appendChild(createBotButton)
+    var botHTML = document.createElement('button')
+    botHTML.classList.add('icon_button')
+    var botIcon = document.createElement('img')
+    botIcon.src = `https://api.dicebear.com/7.x/bottts/svg?seed=${bot.name}`
+    botHTML.appendChild(botIcon)
+    botHTML.onclick = function() {
+        activateCustomBot(bot)
+    }
+    botHTML.id = botID
 
-  customBots.push(bot)
-  addNewCodeSection(bot)
-  botScriptCount++
-  updateAnalysisBoard()
-  updateBattleBots()
+    botContainer.removeChild(document.getElementById('createBotButton'))
+    botContainer.appendChild(botHTML)
+    botContainer.appendChild(createBotButton)
+
+    customBots.push(bot)
+    addNewCodeSection(bot)
+    botScriptCount++
+    updateAnalysisBoard()
+    updateBattleBots()
+
+    addCookie('bots', JSON.stringify(customBots))
 }
-function createEval(){
-  var scriptID = Math.round((Math.random()+1)*1000)
 
-  var script = document.createElement('script');
-  script.id = `script${scriptID}`
-  script.innerHTML = 
+function createEval() {
+    var scriptID = Math.round((Math.random() + 1) * 1000)
+
+    var script = document.createElement('script');
+    script.id = `script${scriptID}`
+    script.innerHTML =
 `function evaluate (gameState){
   var totalScore = 0
   var layout = gameState.fen().split(" ")[0]
@@ -486,24 +611,25 @@ function createEval(){
   }
   return totalScore
 }`
-  document.head.appendChild(script)
+    document.head.appendChild(script)
 
-  addNewEvalSection(scriptID)
-  evalScriptCount++
+    addNewEvalSection(scriptID)
+    evalScriptCount++
 }
-function createMisc(){
-  var scriptID = Math.round((Math.random()+1)*100000)
 
-  var script = document.createElement('script');
-  script.id = `script${scriptID}`
-  script.innerHTML = 
+function createMisc() {
+    var scriptID = Math.round((Math.random() + 1) * 100000)
+
+    var script = document.createElement('script');
+    script.id = `script${scriptID}`
+    script.innerHTML =
 `function doSomething (gameState){
   var something = "Hello World!"
   return something
 }`
-  document.head.appendChild(script)
+    document.head.appendChild(script)
 
-  addNewMiscSection(scriptID)
+    addNewMiscSection(scriptID)
 
-  return scriptID
+    return scriptID
 }

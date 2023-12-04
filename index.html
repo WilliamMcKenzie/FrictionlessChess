@@ -13,6 +13,7 @@
     <script src="https://kit.fontawesome.com/350f22f69a.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="battleStyles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
     <link rel="stylesheet"
       href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css"
       integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU"
@@ -53,8 +54,8 @@
                 <p id="topName">Potlick</p>
             </div>
             <div id="board" style="width: 75vh"></div>
-            <div id="bottomBoard" style="width: 69vh;" class="board_addon">
-                <img id="bottomFace" src="https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0">
+            <div id="bottomBoard" style="width: 74vh;" class="board_addon">
+                <img id="bottomFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Molly&body=squared&clothingColor=456dff&eyes=open&facialHair[]&facialHairProbability=0&hair=shortCombover&hairColor=6c4545&mouth=smile&nose=smallRound&skinColor=e5a07e">
                 <p id="bottomName">You</p>
                 <button class="start_button" id="startButton" style="margin-left: auto;" disabled onclick="battleBots()"><i class="fa-solid fa-play" style="margin-right: 5px;"></i>RUN</button>
                 <button class="resign_button" onclick="resignGame()"><i class="fa-solid fa-flag"></i></button>
@@ -71,7 +72,7 @@
             <div id="botContainer" class="bot_selection_container">
                 <a><p style="margin: 0; font-family: 'header_main'; font-size: 1.4rem;">Added Bots</p> <p style="margin: 0; margin-left: auto; font-size: 0.8rem; font-family: 'bold'; font-weight: 500; display: flex; align-items: flex-end;">LOCK FIRST   <input id="lockFirst" style="margin-right: 10px;" checked type="checkbox" onchange="lockChange(1)"> LOCK SECOND<input id="lockSecond" type="checkbox" onchange="lockChange(2)"></p></a>
                 <button class="icon_button selected_bot locked_bot" id='0' onclick="activateBot(0)">
-                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0" style="border-radius: 5px; padding: 5px;">
+                    <img src="https://api.dicebear.com/7.x/personas/svg?seed=Molly&body=squared&clothingColor=456dff&eyes=open&facialHair[]&facialHairProbability=0&hair=shortCombover&hairColor=6c4545&mouth=smile&nose=smallRound&skinColor=e5a07e" style="border-radius: 5px; padding: 5px;">
                 </button>
                 <button class="icon_button selected_bot" id='1' onclick="activateBot(1)">
                     <img src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat" style="border-radius: 5px; padding: 5px;">
@@ -110,7 +111,7 @@
             <div id="battleBoard" style="width: 75vh">
             </div>
             <div id="bottomBoard" style="width: 74vh;" class="board_addon">
-                <img id="playerFace" src="https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0">
+                <img id="playerFace" src="https://api.dicebear.com/7.x/personas/svg?seed=Molly&body=squared&clothingColor=456dff&eyes=open&facialHair[]&facialHairProbability=0&hair=shortCombover&hairColor=6c4545&mouth=smile&nose=smallRound&skinColor=e5a07e">
                 <p id="playerName">You</p>
                 <button disabled id="resignButton" style="margin-left: auto;" class="resign_button" onclick="stopBattle()"><i class="fa-solid fa-flag"></i></button>
             </div>
@@ -148,7 +149,7 @@
             <div id="battleBotContainer" class="bot_selection_container">
                 <a><p style="margin: 0; margin-right: auto; font-family: 'header_main'; font-size: 1.4rem;">Added Bots</p> </a>
                 <button class="icon_button selected_bot" id='battle0' onclick="activateBattleBot(0)">
-                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Snickers&baseColor=fdd835&eyes=happy&face=square02&mouth=smile01&sides[]&texture[]&topProbability=0" style="border-radius: 5px; padding: 5px;">
+                    <img src="https://api.dicebear.com/7.x/personas/svg?seed=Molly&body=squared&clothingColor=456dff&eyes=open&facialHair[]&facialHairProbability=0&hair=shortCombover&hairColor=6c4545&mouth=smile&nose=smallRound&skinColor=e5a07e" style="border-radius: 5px; padding: 5px;">
                 </button>
                 <button class="icon_button" id='battle1' onclick="activateBattleBot(1)">
                     <img src="https://api.dicebear.com/7.x/bottts/svg?seed=skinnyfat" style="border-radius: 5px; padding: 5px;">
@@ -260,5 +261,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.2/chess.js" integrity="sha384-s3XgLpvmHyscVpijnseAmye819Ee3yaGa8NxstkJVyA6nuDFjt59u1QvuEl/mecz" crossorigin="anonymous"></script>
     <script src="https://cdn.lordicon.com/lordicon.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
 </body>
 </html>

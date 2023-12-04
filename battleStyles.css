@@ -1,116 +1,130 @@
 #roomContainer button {
-    border: 0;
-    border-bottom: 5px solid var(--secondaryDark);
-    border-radius: 5px;
-    padding: 15px;
-    background: var(--secondary);
+	border: 0;
+	border-bottom: 5px solid var(--secondaryDark);
+	border-radius: 5px;
+	padding: 15px;
+	background: var(--secondary);
 
-    font-family: 'header_main';
-    font-size: 1.2rem;
-    color: white;
+	font-family: 'header_main';
+	font-size: 1.2rem;
+	color: white;
 }
+
 #roomContainer button:hover {
-    filter: brightness(1.2);
+	filter: brightness(1.2);
 }
+
 #roomContainer button:disabled {
-    filter: opacity(0.5);
-    cursor: not-allowed;
+	filter: opacity(0.5);
+	cursor: not-allowed;
 }
+
 .disabled {
-    filter: opacity(0.5);
-    cursor: not-allowed;
-    pointer-events: none
+	filter: opacity(0.5);
+	cursor: not-allowed;
+	pointer-events: none
 }
+
 #roomNumber {
-    border: 0;
-    border-bottom: 5px solid var(--secondaryDark);
-    border-radius: 5px;
-    padding: 15px;
-    background: var(--secondary);
+	border: 0;
+	border-bottom: 5px solid var(--secondaryDark);
+	border-radius: 5px;
+	padding: 15px;
+	background: var(--secondary);
 
-    font-family: 'header_main';
-    font-size: 1.2rem;
-    color: white;
+	font-family: 'header_main';
+	font-size: 1.2rem;
+	color: white;
 }
-#roomRequest{
-    border: 0;
-    border-bottom: 5px solid var(--secondaryDark);
-    border-radius: 5px;
-    padding: 15px;
-    background: var(--secondary);
 
-    font-family: 'header_main';
-    font-size: 1.2rem;
-    color: white;
-    outline: 0;
+#roomRequest {
+	border: 0;
+	border-bottom: 5px solid var(--secondaryDark);
+	border-radius: 5px;
+	padding: 15px;
+	background: var(--secondary);
+
+	font-family: 'header_main';
+	font-size: 1.2rem;
+	color: white;
+	outline: 0;
 }
+
 #roomRequest::placeholder {
-    color: var(--secondaryLight);
+	color: var(--secondaryLight);
 }
-#roomCreated {
-    display: flex;
-    flex-direction: column;
-}
-#battleBoard {
-    position: relative;
-    overflow: hidden;
-}
-#battleBoardFilter {
-    backdrop-filter: brightness(0.2);
-    z-index: 2;
-    width: 100%;
-    height: 100%;
-    border-radius: 10px;
-    position: absolute;
-    top: 0;
-}
-.restart {
-    border: 0;
-    border-bottom: 5px solid var(--secondaryDark);
-    border-radius: 5px;
-    padding: 15px;
-    background: var(--secondary);
 
-    font-family: 'header_main';
-    font-size: 1.2rem;
-    color: var(--secondaryLight);
+#roomCreated {
+	display: flex;
+	flex-direction: column;
 }
+
+#battleBoard {
+	position: relative;
+	overflow: hidden;
+}
+
+#battleBoardFilter {
+	backdrop-filter: brightness(0.2);
+	z-index: 2;
+	width: 100%;
+	height: 100%;
+	border-radius: 10px;
+	position: absolute;
+	top: 0;
+}
+
+.restart {
+	border: 0;
+	border-bottom: 5px solid var(--secondaryDark);
+	border-radius: 5px;
+	padding: 15px;
+	background: var(--secondary);
+
+	font-family: 'header_main';
+	font-size: 1.2rem;
+	color: var(--secondaryLight);
+}
+
 .restart:hover {
-    filter: brightness(1.2);
+	filter: brightness(1.2);
 }
 
 
 #registerContainer button {
-    border: 0;
-    border-bottom: 5px solid var(--secondaryDark);
-    border-radius: 5px;
-    padding: 15px;
-    background: var(--secondary);
+	border: 0;
+	border-bottom: 5px solid var(--secondaryDark);
+	border-radius: 5px;
+	padding: 15px;
+	background: var(--secondary);
 
-    font-family: 'header_main';
-    font-size: 1.2rem;
-    color: white;
+	font-family: 'header_main';
+	font-size: 1.2rem;
+	color: white;
 }
+
 #registerContainer button:hover {
-    filter: brightness(1.2);
+	filter: brightness(1.2);
 }
+
 #registerContainer button:disabled {
-    filter: opacity(0.5);
-    cursor: not-allowed;
+	filter: opacity(0.5);
+	cursor: not-allowed;
 }
 
-#registerContainer input{
-    border: 0;
-    border-bottom: 5px solid var(--secondaryDark);
-    border-radius: 5px;
-    padding: 15px;
-    background: var(--secondary);
+#registerContainer input {
+	border: 0;
+	border-bottom: 5px solid var(--secondaryDark);
+	border-radius: 5px;
+	padding: 15px;
+	background: var(--secondary);
 
-    font-family: 'header_main';
-    font-size: 1.2rem;
-    color: white;
-    outline: 0;
+	font-family: 'header_main';
+	font-size: 1.2rem;
+	color: white;
+	outline: 0;
 }
+
 #registerContainer input::placeholder {
-    color: var(--secondaryLight);
+	color: var(--secondaryLight);
 }
