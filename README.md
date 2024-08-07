@@ -1,7 +1,7 @@
 # Chess Bot Arena #
 
 ## Summary ##
-This is a website that allows you to create, battle, and train against chess bots of various difficulties and ratings. It includes multiplayer functionality (Vanilla JS HTML & CSS, serverless with Ably), and a dark & light mode.
+This is a website that allows you to create, battle, and train against chess bots of various difficulties and ratings. It includes multiplayer functionality (Vanilla JS HTML & CSS, serverless with Ably), and a dark & light mode. All bots were handcoded by me in javascript, utilizing minimax algo no a/b pruning yet.
 
 
 ## Tutorial ##
